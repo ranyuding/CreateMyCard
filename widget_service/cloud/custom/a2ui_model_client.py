@@ -8,7 +8,10 @@ import traceback
 import uuid
 from pathlib import Path
 
-import json_repair
+try:
+    import json_repair
+except ModuleNotFoundError:
+    json_repair = None
 
 if __name__ == "__main__" and __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -392,6 +395,9 @@ class A2UIModelClient:
             return json.loads(line)
         except json.JSONDecodeError:
             logger.error(f"{_MODULE} json_parse_failed line={json_for_log(line)}")
+            if json_repair is None:
+                logger.error(f"{_MODULE} json_repair_unavailable")
+                return None
             try:
                 return json_repair.loads(line)
             except Exception as e:

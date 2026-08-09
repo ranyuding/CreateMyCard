@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 from dataclasses import dataclass
 from typing import Any, Literal
@@ -12,6 +13,7 @@ from typing import Any, Literal
 ThemeMode = Literal["light", "dark"]
 
 _A2UI_FORM_CATALOG_ID = "ohos.a2ui.extended.catalog.form"
+_A2UI_ICON_BUTTON_LABEL = "\u200B"
 _COMPONENT_TYPES = frozenset(
     {
         "Row",
@@ -23,6 +25,7 @@ _COMPONENT_TYPES = frozenset(
         "Divider",
         "Progress",
         "Button",
+        "ActionUnit",
         "Checkbox",
     }
 )
@@ -32,6 +35,7 @@ _SEMANTIC_FIELDS = {
     "Image": frozenset({"src"}),
     "Progress": frozenset({"value", "total"}),
     "Button": frozenset({"label", "enabled"}),
+    "ActionUnit": frozenset({"label", "enabled"}),
     "Checkbox": frozenset({"label", "value", "select"}),
 }
 _COMPACT_ONLY_FIELDS = {
@@ -41,7 +45,6 @@ _REQUIRED_FIELDS = {
     "Text": "content",
     "Image": "src",
     "Progress": "value",
-    "Button": "label",
 }
 _COMMON_STYLE_PROPERTIES = frozenset(
     {
@@ -113,6 +116,32 @@ _COMPONENT_STYLE_PROPERTIES = {
     "Stack": frozenset({"alignContent"}),
 }
 _COMMON_COMPACT_PROPERTIES = frozenset({"design", "onClick"})
+_ACTION_UNIT_PROPERTIES = frozenset({"state", "icon", "actionInk"})
+_ACTION_UNIT_FORBIDDEN_SKIN_PROPERTIES = frozenset(
+    {
+        "backgroundColor",
+        "borderColor",
+        "borderRadius",
+        "borderWidth",
+        "color",
+        "design",
+        "fillColor",
+        "fontColor",
+        "fontSize",
+        "fontWeight",
+        "height",
+        "layoutWeight",
+        "linearGradient",
+        "maxFontSize",
+        "maxLines",
+        "minFontSize",
+        "opacity",
+        "padding",
+        "textAlign",
+        "textOverflow",
+        "width",
+    }
+)
 _NUMBER_PROPERTIES = frozenset(
     {
         "borderRadius",
@@ -147,6 +176,9 @@ _STRING_PROPERTIES = frozenset(
         "textOverflow",
         "type",
         "visibility",
+        "state",
+        "icon",
+        "actionInk",
     }
 )
 _FORBIDDEN_PROPERTIES = frozenset({"action", "event", "submit_form"})
@@ -199,6 +231,7 @@ _COLOR_PROPERTIES = frozenset(
         "color",
         "fillColor",
         "fontColor",
+        "actionInk",
         "selectedColor",
         "shadowColor",
         "strokeColor",
@@ -262,6 +295,40 @@ _COLOR_TOKENS = {
     "mask_fifth": "#19000000",
     "mask_sixth": "#0C000000",
 }
+_ROOT_LINEAR_GRADIENT_PALETTES = (
+    {
+        "angle": 145,
+        "colors": [["#FFFFFFFF", 0.0], ["#FFF4FBFF", 0.44], ["#FF86C5E3", 1.0]],
+    },
+    {
+        "angle": 145,
+        "colors": [["#FFFFFFFF", 0.0], ["#FFEAF9F3", 0.46], ["#FF8FDCCC", 1.0]],
+    },
+    {
+        "angle": 145,
+        "colors": [["#FFFFFFFF", 0.0], ["#FFF0FBF8", 0.44], ["#FF92D6CC", 1.0]],
+    },
+    {
+        "angle": 145,
+        "colors": [["#FFFFFFFF", 0.0], ["#FFFFF7CC", 0.46], ["#FFFFE066", 1.0]],
+    },
+    {
+        "angle": 145,
+        "colors": [["#FFFFFFFF", 0.0], ["#FFFFF1E6", 0.46], ["#FFFFC58F", 1.0]],
+    },
+    {
+        "angle": 145,
+        "colors": [["#FFFFFFFF", 0.0], ["#FFF5EFFF", 0.44], ["#FFCBB7FF", 1.0]],
+    },
+    {
+        "angle": 145,
+        "colors": [["#FFFFFFFF", 0.0], ["#FFFFEFF4", 0.44], ["#FFFFB8CA", 1.0]],
+    },
+    {
+        "angle": 145,
+        "colors": [["#FFFFFFFF", 0.0], ["#FFF2F8FF", 0.44], ["#FFBCD6FF", 1.0]],
+    },
+)
 _TEXT_DESIGNS: dict[str, dict[str, Any]] = {
     "display-l": {"fontSize": 56, "fontWeight": 300},
     "display-m": {"fontSize": 48, "fontWeight": 300},
@@ -277,17 +344,21 @@ _TEXT_DESIGNS: dict[str, dict[str, Any]] = {
     "body-s": {"fontSize": 12, "fontWeight": 400},
     "caption-l": {"fontSize": 12, "fontWeight": 500},
     "caption-m": {"fontSize": 10, "fontWeight": 500},
+    "card-title": {"fontSize": 14, "fontWeight": 500},
+    "hero-value": {"fontSize": 28, "fontWeight": 700},
+    "hero-label": {"fontSize": 12, "fontWeight": 400},
+    "meta-text": {"fontSize": 12, "fontWeight": 400},
 }
 _BUTTON_DESIGNS: dict[str, dict[str, Any]] = {
     "capsule": {
         "width": "matchParent",
-        "height": 36,
-        "borderRadius": 20,
+        "height": 30,
+        "borderRadius": 15,
         "padding": {"left": 8, "top": 0, "right": 8, "bottom": 0},
-        "backgroundColor": "comp_background_tertiary",
+        "backgroundColor": "#190A59F7",
         "fontColor": "font_emphasize",
         "fontSize": 14,
-        "fontWeight": 500,
+        "fontWeight": 700,
         "maxFontSize": 14,
         "minFontSize": 12,
         "maxLines": 1,
@@ -310,6 +381,18 @@ _IMAGE_DESIGNS: dict[str, dict[str, Any]] = {
         "borderRadius": 8,
         "objectFit": "cover",
         "clip": True,
+        "flexShrink": 0,
+    },
+    "source-icon": {
+        "width": 20,
+        "height": 20,
+        "objectFit": "contain",
+        "flexShrink": 0,
+    },
+    "hero-icon": {
+        "width": 36,
+        "height": 36,
+        "objectFit": "contain",
         "flexShrink": 0,
     },
 }
@@ -406,9 +489,9 @@ _COMPACT_ROOT_DIMENSIONS = {
     "4x2": {"width": 320, "height": 160},
 }
 _A2UI_FALLBACK_DIMENSIONS = {
-    "2x2": {"width": 140, "height": 140},
-    "2x4": {"width": 300, "height": 140},
-    "4x2": {"width": 300, "height": 140},
+    "2x2": {"width": 160, "height": 160},
+    "2x4": {"width": 320, "height": 160},
+    "4x2": {"width": 320, "height": 160},
 }
 
 
@@ -474,8 +557,14 @@ def repair_compact_dsl_binding_paths(
     """Repair unique data roots or safely inline unbacked local values."""
     rows = _parse_compact_rows(compact_dsl)
     components, data_rows = _validate_component_tree(rows)
+    event_replacements = _event_handler_replacements(components, task_spec)
     schema = task_spec.get("dataModelSchema")
     if not isinstance(schema, dict):
+        if event_replacements:
+            return _serialize_repaired_rows(
+                rows,
+                event_replacements=event_replacements,
+            )
         return compact_dsl
 
     component_paths = _component_binding_paths(components)
@@ -502,8 +591,26 @@ def repair_compact_dsl_binding_paths(
         if not roots and path in component_paths and path in data_values:
             literal_replacements[path] = copy.deepcopy(data_values[path])
 
-    if not path_replacements and not literal_replacements:
+    if not path_replacements and not literal_replacements and not event_replacements:
         return compact_dsl
+    return _serialize_repaired_rows(
+        rows,
+        path_replacements=path_replacements,
+        literal_replacements=literal_replacements,
+        event_replacements=event_replacements,
+    )
+
+
+def _serialize_repaired_rows(
+    rows: list[CompactRow],
+    *,
+    path_replacements: dict[str, str] | None = None,
+    literal_replacements: dict[str, Any] | None = None,
+    event_replacements: dict[str, dict[str, Any]] | None = None,
+) -> str:
+    path_replacements = path_replacements or {}
+    literal_replacements = literal_replacements or {}
+    event_replacements = event_replacements or {}
     repaired_rows: list[list[Any]] = []
     for row in rows:
         if isinstance(row, DataRow):
@@ -521,6 +628,7 @@ def repair_compact_dsl_binding_paths(
             path_replacements,
             literal_replacements,
         )
+        props = _replace_event_handlers(props, event_replacements)
         original_content = row.props.get("content")
         content = props.get("content")
         if row.component_type == "Text" and _is_path_binding(original_content):
@@ -591,11 +699,19 @@ def convert_compact_dsl_to_a2ui(
     data_model = _build_data_model(data_rows)
     _validate_binding_paths(normalized_components, data_model)
 
+    icon_round_button_ids = _button_ids_with_design(components, "icon-round")
+    fallback_root_gradient = _fallback_root_linear_gradient(compact_dsl)
     converted_components = []
     for component in normalized_components:
-        converted_components.append(_convert_component(component))
-
-    dimensions = _surface_dimensions(size, protocol_profile)
+        hide_label = component.component_id in icon_round_button_ids
+        converted_components.extend(
+            _convert_component_rows(
+                component,
+                hide_label=hide_label,
+                fallback_root_gradient=fallback_root_gradient,
+            )
+        )
+    surface_dimensions = _surface_dimensions(size, protocol_profile)
     version = str(protocol_profile.get("version") or "v0.9")
     messages = [
         {
@@ -603,8 +719,8 @@ def convert_compact_dsl_to_a2ui(
             "createSurface": {
                 "surfaceId": surface_id,
                 "catalogId": _A2UI_FORM_CATALOG_ID,
-                "width": dimensions["width"],
-                "height": dimensions["height"],
+                "width": surface_dimensions["width"],
+                "height": surface_dimensions["height"],
             },
         },
         {
@@ -659,7 +775,14 @@ def _strip_optional_genui_fence(compact_dsl: str) -> str:
 
 
 def _find_fence_opening(lines: list[str]) -> int | None:
-    supported_openings = {"```", "```genui", "```json"}
+    supported_openings = {
+        "```",
+        "```genui",
+        "```json",
+        "```text",
+        "```designcompactdsl",
+        "```design-compact-dsl",
+    }
     for index, line in enumerate(lines):
         if line.strip().lower() in supported_openings:
             return index
@@ -820,8 +943,9 @@ def _parse_compact_rows(compact_dsl: str) -> list[CompactRow]:
 
     if not rows:
         raise CompactDslConversionError("Compact DSL output is empty.")
-    degraded_rows = _degrade_button_image_children(rows)
-    return _canonicalize_component_order(degraded_rows)
+    _validate_button_image_children(rows)
+    visible_rows = _drop_empty_image_components(rows)
+    return _canonicalize_component_order(visible_rows)
 
 
 def _canonicalize_component_order(rows: list[CompactRow]) -> list[CompactRow]:
@@ -842,7 +966,7 @@ def _canonicalize_component_order(rows: list[CompactRow]) -> list[CompactRow]:
     root = components_by_id.get("root")
     if root is None:
         return rows
-    if root.component_type != "Column":
+    if root.component_type not in _CONTAINER_TYPES:
         return rows
 
     ordered_components: list[ComponentRow] = []
@@ -856,8 +980,6 @@ def _canonicalize_component_order(rows: list[CompactRow]) -> list[CompactRow]:
         visited,
     )
     if not is_complete:
-        return rows
-    if len(visited) != len(components_by_id):
         return rows
     return [*ordered_components, *data_rows]
 
@@ -914,6 +1036,12 @@ def _parse_row(value: list[Any], line_number: int) -> CompactRow:
         _decode_json_pointer(path)
         _validate_source_value(value[1], f"data row {path}")
         return DataRow(path=path, value=copy.deepcopy(value[1]))
+    if _looks_like_data_def_row(value):
+        props = value[2]
+        path = props.get("path", "/")
+        _decode_json_pointer(path)
+        _validate_source_value(props["value"], f"data row {path}")
+        return DataRow(path=path, value=copy.deepcopy(props["value"]))
     return _parse_component_row(value, line_number)
 
 
@@ -923,12 +1051,27 @@ def _looks_like_data_row(value: list[Any]) -> bool:
     return isinstance(value[0], str) and value[0].startswith("/")
 
 
+def _looks_like_data_def_row(value: list[Any]) -> bool:
+    if len(value) != 3:
+        return False
+    if value[1] != "DataDef" or not isinstance(value[2], dict):
+        return False
+    path = value[2].get("path", "/")
+    return isinstance(path, str) and "value" in value[2]
+
+
 def _parse_component_row(value: list[Any], line_number: int) -> ComponentRow:
+    value = _repair_legacy_component_row(value)
     if len(value) not in {3, 4}:
         raise CompactDslConversionError(
             f"Compact DSL line {line_number} has an unsupported row shape."
         )
     component_id, component_type, props = value[:3]
+    component_type, props = _repair_legacy_component_props(
+        component_id,
+        component_type,
+        props,
+    )
     _validate_component_header(
         component_id,
         component_type,
@@ -936,13 +1079,249 @@ def _parse_component_row(value: list[Any], line_number: int) -> ComponentRow:
         line_number,
     )
     children = _parse_children(value, component_id, component_type)
-    _validate_component_props(component_id, component_type, props)
+    if not _is_empty_image_component(component_type, props):
+        _validate_component_props(component_id, component_type, props)
     return ComponentRow(
         component_id=component_id,
         component_type=component_type,
         props=copy.deepcopy(props),
         children=children,
     )
+
+
+def _repair_legacy_component_row(value: list[Any]) -> list[Any]:
+    if len(value) not in {3, 4}:
+        return value
+    props = value[2]
+    if not isinstance(props, dict) or "children" not in props:
+        return value
+
+    repaired_props = copy.deepcopy(props)
+    props_children = repaired_props.pop("children")
+    repaired_value = [value[0], value[1], repaired_props]
+    if len(value) == 4:
+        repaired_value.append(value[3])
+        return repaired_value
+    if isinstance(props_children, list):
+        repaired_value.append(props_children)
+        return repaired_value
+
+    repaired_props["children"] = props_children
+    return repaired_value
+
+
+def _repair_legacy_component_props(
+    component_id: Any,
+    component_type: Any,
+    props: Any,
+) -> tuple[Any, Any]:
+    if not isinstance(props, dict):
+        return component_type, props
+
+    repaired_props = _repair_legacy_bindings(copy.deepcopy(props))
+    repaired_type = component_type
+    if isinstance(component_id, str) and component_id == "root":
+        repaired_props.pop("size", None)
+    if "flexGrow" in repaired_props:
+        if "layoutWeight" not in repaired_props:
+            repaired_props["layoutWeight"] = repaired_props["flexGrow"]
+        repaired_props.pop("flexGrow", None)
+    _repair_dimension_aliases(repaired_props)
+    _repair_axis_value_aliases(repaired_type, repaired_props)
+
+    _repair_spacing_aliases(repaired_type, repaired_props)
+    if repaired_type == "Text":
+        _repair_text_value_alias(repaired_props)
+    if repaired_type == "Image":
+        _drop_image_fill_color(repaired_props)
+    if repaired_type == "Progress":
+        _repair_progress_alias_props(repaired_props)
+    if repaired_type == "Ring":
+        repaired_type = "Progress"
+        _repair_progress_alias_props(repaired_props, default_design="ring")
+    if repaired_type == "ActionUnit":
+        _repair_action_unit_props(repaired_props)
+    _repair_on_click_aliases(repaired_props)
+    return repaired_type, repaired_props
+
+
+def _repair_action_unit_props(props: dict[str, Any]) -> None:
+    icon = props.get("icon")
+    if props.get("state") == "capsule" and isinstance(icon, str) and not icon.strip():
+        props.pop("icon", None)
+
+
+def _drop_image_fill_color(props: dict[str, Any]) -> None:
+    props.pop("fillColor", None)
+
+
+def _repair_on_click_aliases(props: dict[str, Any]) -> None:
+    if "onClick" not in props:
+        return
+    normalized = _normalize_on_click_alias(props["onClick"])
+    if normalized is not None:
+        props["onClick"] = normalized
+
+
+def _normalize_on_click_alias(value: Any) -> list[dict[str, Any]] | None:
+    if isinstance(value, dict):
+        return [copy.deepcopy(value)]
+    if _is_on_click_pair(value):
+        return [_on_click_pair_to_handler(value)]
+    if isinstance(value, list):
+        return _normalize_on_click_list(value)
+    return None
+
+
+def _is_on_click_pair(value: Any) -> bool:
+    if not isinstance(value, list):
+        return False
+    if len(value) != 2:
+        return False
+    return isinstance(value[0], str) and isinstance(value[1], dict)
+
+
+def _on_click_pair_to_handler(value: list[Any]) -> dict[str, Any]:
+    args = copy.deepcopy(value[1])
+    if set(args) == {"args"} and isinstance(args.get("args"), dict):
+        args = copy.deepcopy(args["args"])
+    return {"call": value[0], "args": args}
+
+
+def _normalize_on_click_list(value: list[Any]) -> list[dict[str, Any]] | None:
+    if _is_on_click_pair(value):
+        return [_on_click_pair_to_handler(value)]
+    normalized: list[dict[str, Any]] = []
+    for item in value:
+        if not isinstance(item, dict):
+            return None
+        normalized.append(copy.deepcopy(item))
+    return normalized
+
+
+def _repair_text_value_alias(props: dict[str, Any]) -> None:
+    if "content" in props:
+        return
+    if "value" in props:
+        props["content"] = props.pop("value")
+    elif "text" in props:
+        props["content"] = props.pop("text")
+
+
+def _repair_progress_alias_props(
+    props: dict[str, Any],
+    *,
+    default_design: str | None = None,
+) -> None:
+    if default_design is not None and "design" not in props and "type" not in props:
+        props["design"] = default_design
+    size = props.pop("size", None)
+    if size is not None:
+        if "width" not in props:
+            props["width"] = size
+        if "height" not in props:
+            props["height"] = size
+    _repair_progress_color_alias(props)
+
+
+def _repair_progress_color_alias(props: dict[str, Any]) -> None:
+    colors = props.pop("colors", None)
+    if colors is None or "color" in props:
+        return
+    color = _first_progress_color(colors)
+    if color is not None:
+        props["color"] = color
+
+
+def _first_progress_color(colors: Any) -> str | None:
+    if not isinstance(colors, list) or not colors:
+        return None
+    first_color = colors[0]
+    if isinstance(first_color, dict) and isinstance(first_color.get("color"), str):
+        return first_color["color"]
+    if isinstance(first_color, list) and first_color:
+        color = first_color[0]
+        if isinstance(color, str):
+            return color
+    return None
+
+
+def _repair_dimension_aliases(props: dict[str, Any]) -> None:
+    for dimension_name in ("width", "height"):
+        if props.get(dimension_name) in {"100%", "stretch"}:
+            props[dimension_name] = "matchParent"
+
+
+def _repair_spacing_aliases(
+    component_type: Any,
+    props: dict[str, Any],
+) -> None:
+    if component_type in {"Row", "Column"} and "space" in props:
+        if "itemMargin" not in props:
+            props["itemMargin"] = props["space"]
+        props.pop("space", None)
+    elif component_type == "List" and "itemMargin" in props:
+        if "space" not in props:
+            props["space"] = props["itemMargin"]
+        props.pop("itemMargin", None)
+
+
+def _repair_axis_value_aliases(
+    component_type: Any,
+    props: dict[str, Any],
+) -> None:
+    justify_content = props.get("justifyContent")
+    if justify_content == "space-between":
+        props["justifyContent"] = "spaceBetween"
+    elif justify_content == "space-around":
+        props["justifyContent"] = "spaceAround"
+    elif justify_content == "space-evenly":
+        props["justifyContent"] = "spaceEvenly"
+    elif justify_content == "flex-start":
+        props["justifyContent"] = "start"
+    elif justify_content == "flex-end":
+        props["justifyContent"] = "end"
+
+    align_items = props.get("alignItems")
+    if component_type == "Row":
+        if align_items in {"flex-start", "start"}:
+            props["alignItems"] = "top"
+        elif align_items in {"flex-end", "end"}:
+            props["alignItems"] = "bottom"
+    elif component_type == "Column":
+        if align_items in {"flex-start", "top"}:
+            props["alignItems"] = "start"
+        elif align_items in {"flex-end", "bottom"}:
+            props["alignItems"] = "end"
+
+
+def _repair_legacy_bindings(value: Any) -> Any:
+    if isinstance(value, dict):
+        legacy_path = _legacy_binding_path(value)
+        if legacy_path is not None:
+            return {"path": legacy_path}
+        repaired: dict[str, Any] = {}
+        for key, child_value in value.items():
+            repaired[key] = _repair_legacy_bindings(child_value)
+        return repaired
+    if isinstance(value, list):
+        repaired_items: list[Any] = []
+        for item in value:
+            repaired_items.append(_repair_legacy_bindings(item))
+        return repaired_items
+    return value
+
+
+def _legacy_binding_path(value: dict[str, Any]) -> str | None:
+    if len(value) != 1:
+        return None
+    key, path = next(iter(value.items()))
+    if not isinstance(key, str) or not isinstance(path, str):
+        return None
+    normalized_key = key.replace("\\", "").replace("(", "").replace(")", "")
+    if "data" in normalized_key.lower() and path.startswith("/"):
+        return path
+    return None
 
 
 def _validate_component_header(
@@ -1005,9 +1384,7 @@ def _parse_children(
     return ()
 
 
-def _degrade_button_image_children(
-    rows: list[CompactRow],
-) -> list[CompactRow]:
+def _validate_button_image_children(rows: list[CompactRow]) -> None:
     components_by_id = {
         row.component_id: row
         for row in rows
@@ -1032,22 +1409,55 @@ def _degrade_button_image_children(
             )
         button_icon_ids.add(icon_id)
 
-    if not button_icon_ids:
+    if button_icon_ids:
+        _validate_button_icon_ownership(rows, button_icon_ids)
+
+
+def _drop_empty_image_components(rows: list[CompactRow]) -> list[CompactRow]:
+    empty_image_ids = {
+        row.component_id
+        for row in rows
+        if isinstance(row, ComponentRow)
+        and _is_empty_image_component(row.component_type, row.props)
+    }
+    if not empty_image_ids:
         return rows
 
-    _validate_button_icon_ownership(rows, button_icon_ids)
-    degraded_rows: list[CompactRow] = []
+    visible_rows: list[CompactRow] = []
     for row in rows:
-        if isinstance(row, ComponentRow) and row.component_id in button_icon_ids:
+        if not isinstance(row, ComponentRow):
+            visible_rows.append(row)
             continue
-        if isinstance(row, ComponentRow) and row.component_type == "Button":
-            row = ComponentRow(
-                component_id=row.component_id,
-                component_type=row.component_type,
-                props=row.props,
-            )
-        degraded_rows.append(row)
-    return degraded_rows
+        if row.component_id in empty_image_ids:
+            continue
+        visible_rows.append(_without_children(row, empty_image_ids))
+    return visible_rows
+
+
+def _without_children(
+    row: ComponentRow,
+    removed_ids: set[str],
+) -> ComponentRow:
+    if not row.children:
+        return row
+    children = tuple(child_id for child_id in row.children if child_id not in removed_ids)
+    if children == row.children:
+        return row
+    return ComponentRow(
+        row.component_id,
+        row.component_type,
+        copy.deepcopy(row.props),
+        children,
+    )
+
+
+def _is_empty_image_component(
+    component_type: Any,
+    props: Any,
+) -> bool:
+    if component_type != "Image" or not isinstance(props, dict):
+        return False
+    return props.get("src") == ""
 
 
 def _validate_button_icon_ownership(
@@ -1118,7 +1528,9 @@ def _validate_component_props(
             f"{component_id}: {component_type}.{required_field} is required."
         )
     if component_type == "Button":
-        _validate_button_label(component_id, props.get("label"))
+        _validate_button_props(component_id, props)
+    if component_type == "ActionUnit":
+        _validate_action_unit_props(component_id, props)
     _validate_semantic_props(component_id, component_type, props)
     if "onClick" in props:
         _validate_on_click(component_id, props["onClick"])
@@ -1132,6 +1544,8 @@ def _validate_allowed_component_properties(
 ) -> None:
     allowed = set(_COMMON_STYLE_PROPERTIES)
     allowed.update(_COMMON_COMPACT_PROPERTIES)
+    if component_type == "ActionUnit":
+        allowed.update(_ACTION_UNIT_PROPERTIES)
     allowed.update(_SEMANTIC_FIELDS.get(component_type, frozenset()))
     allowed.update(_COMPACT_ONLY_FIELDS.get(component_type, frozenset()))
     allowed.update(_COMPONENT_STYLE_PROPERTIES.get(component_type, frozenset()))
@@ -1230,6 +1644,71 @@ def _validate_button_label(component_id: str, label: Any) -> None:
         )
 
 
+def _validate_button_props(component_id: str, props: dict[str, Any]) -> None:
+    if props.get("design") == "icon-round":
+        return
+    _validate_button_label(component_id, props.get("label"))
+
+
+def _validate_action_unit_props(component_id: str, props: dict[str, Any]) -> None:
+    _validate_action_unit_skin_props(component_id, props)
+    state = props.get("state")
+    if state not in {"capsule", "icon-round"}:
+        raise CompactDslConversionError(
+            f'{component_id}: ActionUnit.state must be "capsule" or "icon-round".'
+        )
+    if "onClick" not in props:
+        raise CompactDslConversionError(
+            f"{component_id}: ActionUnit requires an onClick event."
+        )
+    if state == "capsule":
+        _validate_button_label(component_id, props.get("label"))
+        _validate_optional_action_unit_icon(component_id, props)
+        return
+    if "label" in props:
+        raise CompactDslConversionError(
+            f"{component_id}: icon-round ActionUnit must not contain label."
+        )
+    _validate_required_action_unit_icon(component_id, props)
+
+
+def _validate_action_unit_skin_props(
+    component_id: str,
+    props: dict[str, Any],
+) -> None:
+    unsupported = sorted(set(props).intersection(_ACTION_UNIT_FORBIDDEN_SKIN_PROPERTIES))
+    if not unsupported:
+        return
+    names = ", ".join(unsupported)
+    raise CompactDslConversionError(
+        f"{component_id}: ActionUnit must not define skin properties: {names}."
+    )
+
+
+def _validate_optional_action_unit_icon(
+    component_id: str,
+    props: dict[str, Any],
+) -> None:
+    icon = props.get("icon")
+    if icon is None:
+        return
+    if isinstance(icon, str) and not icon.strip():
+        return
+    _validate_image_source(component_id, icon)
+
+
+def _validate_required_action_unit_icon(
+    component_id: str,
+    props: dict[str, Any],
+) -> None:
+    icon = props.get("icon")
+    if icon is None:
+        raise CompactDslConversionError(
+            f"{component_id}: icon-round ActionUnit requires icon."
+        )
+    _validate_image_source(component_id, icon)
+
+
 def _validate_semantic_props(
     component_id: str,
     component_type: str,
@@ -1251,6 +1730,9 @@ def _validate_semantic_props(
         return
     if component_type == "Button":
         _validate_optional_bool(component_id, "Button.enabled", props)
+        return
+    if component_type == "ActionUnit":
+        _validate_optional_bool(component_id, "ActionUnit.enabled", props)
         return
     if component_type == "Checkbox":
         _validate_checkbox_props(component_id, props)
@@ -1625,18 +2107,206 @@ def _component_to_tuple(component: ComponentRow) -> list[Any]:
         component.component_type,
         copy.deepcopy(component.props),
     ]
-    if component.component_type in _CONTAINER_TYPES:
+    if component.component_type in _CONTAINER_TYPES or component.children:
         row.append(list(component.children))
     return row
 
 
-def _convert_component(component: ComponentRow) -> dict[str, Any]:
+def _button_ids_with_design(
+    components: list[ComponentRow],
+    design: str,
+) -> set[str]:
+    button_ids: set[str] = set()
+    for component in components:
+        if component.component_type != "Button":
+            continue
+        if component.props.get("design") == design:
+            button_ids.add(component.component_id)
+    return button_ids
+
+
+def _convert_component_rows(
+    component: ComponentRow,
+    *,
+    hide_label: bool = False,
+    fallback_root_gradient: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    if component.component_type == "ActionUnit":
+        return _convert_action_unit(component)
+    return [
+        _convert_component(
+            component,
+            hide_label=hide_label,
+            fallback_root_gradient=fallback_root_gradient,
+        )
+    ]
+
+
+def _convert_action_unit(component: ComponentRow) -> list[dict[str, Any]]:
+    state = component.props["state"]
+    if state == "capsule":
+        return _convert_action_unit_capsule(component)
+    return _convert_action_unit_icon_round(component)
+
+
+def _convert_action_unit_capsule(component: ComponentRow) -> list[dict[str, Any]]:
+    icon = component.props.get("icon")
+    if isinstance(icon, str) and icon:
+        return _convert_action_unit_capsule_with_icon(component, icon)
+
     converted: dict[str, Any] = {
         "id": component.component_id,
-        "component": component.component_type,
+        "component": "Button",
+        "label": component.props["label"],
+        "onClick": _convert_path_bindings(component.props["onClick"]),
     }
-    if component.component_type in _CONTAINER_TYPES:
+    if "enabled" in component.props:
+        converted["enabled"] = _convert_path_bindings(component.props["enabled"])
+    styles = _resolved_design_styles(component.component_id, _BUTTON_DESIGNS["capsule"])
+    action_ink = component.props.get("actionInk")
+    if action_ink is not None:
+        styles["fontColor"] = action_ink
+    converted["styles"] = styles
+    return [converted]
+
+
+def _convert_action_unit_capsule_with_icon(
+    component: ComponentRow,
+    icon_source: str,
+) -> list[dict[str, Any]]:
+    icon_id = f"{component.component_id}_icon"
+    text_id = f"{component.component_id}_text"
+    styles = _resolved_design_styles(component.component_id, _BUTTON_DESIGNS["capsule"])
+    text_styles = _capsule_text_styles(styles, component.props.get("actionInk"))
+    row_styles = _capsule_row_styles(styles)
+    row: dict[str, Any] = {
+        "id": component.component_id,
+        "component": "Row",
+        "children": [icon_id, text_id],
+        "itemMargin": 4,
+        "onClick": _convert_path_bindings(component.props["onClick"]),
+        "styles": row_styles,
+    }
+    icon = {
+        "id": icon_id,
+        "component": "Image",
+        "src": icon_source,
+        "styles": {
+            "width": 16,
+            "height": 16,
+            "objectFit": "contain",
+            "flexShrink": 0,
+        },
+    }
+    text = {
+        "id": text_id,
+        "component": "Text",
+        "content": component.props["label"],
+        "styles": text_styles,
+    }
+    return [row, icon, text]
+
+
+def _capsule_row_styles(styles: dict[str, Any]) -> dict[str, Any]:
+    row_style_names = {
+        "backgroundColor",
+        "borderRadius",
+        "flexShrink",
+        "height",
+        "padding",
+        "width",
+    }
+    row_styles = {
+        name: copy.deepcopy(value)
+        for name, value in styles.items()
+        if name in row_style_names
+    }
+    row_styles["justifyContent"] = "center"
+    row_styles["alignItems"] = "center"
+    return row_styles
+
+
+def _capsule_text_styles(
+    capsule_styles: dict[str, Any],
+    action_ink: Any,
+) -> dict[str, Any]:
+    text_style_names = {
+        "fontColor",
+        "fontSize",
+        "fontWeight",
+        "maxFontSize",
+        "maxLines",
+        "minFontSize",
+    }
+    text_styles = {
+        name: copy.deepcopy(value)
+        for name, value in capsule_styles.items()
+        if name in text_style_names
+    }
+    if action_ink is not None:
+        text_styles["fontColor"] = action_ink
+    text_styles.update(
+        {
+            "width": 94,
+            "height": capsule_styles.get("height", 30),
+            "textAlign": "center",
+            "textOverflow": "ellipsis",
+            "flexShrink": 0,
+        }
+    )
+    return text_styles
+
+
+def _convert_action_unit_icon_round(component: ComponentRow) -> list[dict[str, Any]]:
+    icon_id = f"{component.component_id}_icon"
+    styles = _resolved_design_styles(component.component_id, _BUTTON_DESIGNS["icon-round"])
+    _normalize_icon_button_stack(styles)
+    stack = {
+        "id": component.component_id,
+        "component": "Stack",
+        "children": [icon_id],
+        "onClick": _convert_path_bindings(component.props["onClick"]),
+        "styles": styles,
+    }
+    icon = {
+        "id": icon_id,
+        "component": "Image",
+        "src": component.props["icon"],
+        "styles": {
+            "width": 16,
+            "height": 16,
+            "objectFit": "contain",
+            "flexShrink": 0,
+        },
+    }
+    return [stack, icon]
+
+
+def _resolved_design_styles(
+    component_id: str,
+    styles: dict[str, Any],
+) -> dict[str, Any]:
+    resolved: dict[str, Any] = {}
+    for property_name, value in styles.items():
+        resolved[property_name] = _resolve_tokens(property_name, value, component_id)
+    return resolved
+
+
+def _convert_component(
+    component: ComponentRow,
+    *,
+    hide_label: bool = False,
+    fallback_root_gradient: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    output_type = _output_component_type(component, hide_label)
+    converted: dict[str, Any] = {
+        "id": component.component_id,
+        "component": output_type,
+    }
+    if output_type in _CONTAINER_TYPES:
         converted["children"] = list(component.children)
+    if hide_label and output_type == "Button":
+        converted["label"] = _A2UI_ICON_BUTTON_LABEL
 
     styles: dict[str, Any] = {}
     semantic_fields = _SEMANTIC_FIELDS.get(
@@ -1648,6 +2318,8 @@ def _convert_component(component: ComponentRow) -> dict[str, Any]:
         frozenset(),
     )
     for property_name, source_value in component.props.items():
+        if property_name == "label" and hide_label:
+            continue
         if property_name in compact_only_fields:
             continue
         value = _convert_path_bindings(source_value)
@@ -1662,11 +2334,83 @@ def _convert_component(component: ComponentRow) -> dict[str, Any]:
         styles[property_name] = value
 
     if component.component_id == "root":
-        styles["width"] = "matchParent"
-        styles["height"] = "matchParent"
+        _normalize_root_component(
+            component,
+            converted,
+            styles,
+            fallback_root_gradient,
+        )
+    if _is_icon_button_stack(component, hide_label):
+        _normalize_icon_button_stack(styles)
+    if component.component_type == "Text":
+        _normalize_text_component(styles)
     if styles:
         converted["styles"] = styles
     return converted
+
+
+def _output_component_type(component: ComponentRow, hide_label: bool) -> str:
+    if _is_icon_button_stack(component, hide_label):
+        return "Stack"
+    return component.component_type
+
+
+def _is_icon_button_stack(component: ComponentRow, hide_label: bool) -> bool:
+    if not hide_label or component.component_type != "Button":
+        return False
+    return bool(component.children)
+
+
+def _normalize_icon_button_stack(styles: dict[str, Any]) -> None:
+    styles["alignContent"] = "center"
+    styles["clip"] = True
+
+
+def _normalize_text_component(styles: dict[str, Any]) -> None:
+    styles["maxLines"] = 1
+    styles["textOverflow"] = "ellipsis"
+
+
+def _normalize_root_component(
+    component: ComponentRow,
+    converted: dict[str, Any],
+    styles: dict[str, Any],
+    fallback_gradient: dict[str, Any] | None,
+) -> None:
+    styles["width"] = "matchParent"
+    styles["height"] = "matchParent"
+    if _is_2x2_root(component.props):
+        styles["padding"] = 12
+        styles["borderRadius"] = 20
+        styles["clip"] = True
+        styles.setdefault("justifyContent", "spaceBetween")
+        converted["itemMargin"] = 8
+    _ensure_root_background(styles, fallback_gradient)
+
+
+def _is_2x2_root(props: dict[str, Any]) -> bool:
+    return props.get("width") == 160 and props.get("height") == 160
+
+
+def _ensure_root_background(
+    styles: dict[str, Any],
+    fallback_gradient: dict[str, Any] | None,
+) -> None:
+    has_background = any(
+        name in styles
+        for name in ("linearGradient", "backgroundColor", "backgroundImage")
+    )
+    if has_background:
+        return
+    gradient = fallback_gradient or _ROOT_LINEAR_GRADIENT_PALETTES[0]
+    styles["linearGradient"] = copy.deepcopy(gradient)
+
+
+def _fallback_root_linear_gradient(seed: str) -> dict[str, Any]:
+    digest = hashlib.sha256(seed.encode("utf-8")).digest()
+    palette_index = int.from_bytes(digest[:2], "big")
+    palette_index %= len(_ROOT_LINEAR_GRADIENT_PALETTES)
+    return copy.deepcopy(_ROOT_LINEAR_GRADIENT_PALETTES[palette_index])
 
 
 def _move_component_property(
@@ -1733,6 +2477,8 @@ def _surface_dimensions(
 ) -> dict[str, int]:
     if size not in _A2UI_FALLBACK_DIMENSIONS:
         raise CompactDslConversionError(f'Unsupported Form size "{size}".')
+    if size in _COMPACT_ROOT_DIMENSIONS:
+        return copy.deepcopy(_COMPACT_ROOT_DIMENSIONS[size])
     sizes = protocol_profile.get("sizes")
     dimensions = _profile_dimensions(size, sizes)
     if dimensions is not None:
@@ -1763,6 +2509,9 @@ def _is_positive_integer(value: Any) -> bool:
 
 
 def _build_data_model(data_rows: list[DataRow]) -> dict[str, Any]:
+    if not data_rows:
+        return {"data": {}}
+
     root: dict[str, Any] = {}
     data_values: dict[str, Any] = {}
     for row in data_rows:
@@ -2092,15 +2841,23 @@ def _validate_asset_candidates(
 ) -> None:
     allowed_sources = _candidate_asset_sources(task_spec)
     for component in components:
-        if component.component_type != "Image":
-            continue
-        source = component.props.get("src")
-        if source in allowed_sources:
+        source = _candidate_component_asset_source(component)
+        if source is None or source in allowed_sources:
             continue
         raise CompactDslConversionError(
-            f'{component.component_id}: Image.src "{source}" is not present '
+            f'{component.component_id}: asset "{source}" is not present '
             "in TaskSpec.assetCandidates."
         )
+
+
+def _candidate_component_asset_source(component: ComponentRow) -> str | None:
+    if component.component_type == "Image":
+        source = component.props.get("src")
+    elif component.component_type == "ActionUnit":
+        source = component.props.get("icon")
+    else:
+        return None
+    return source if isinstance(source, str) and source else None
 
 
 def _candidate_asset_sources(task_spec: dict[str, Any]) -> set[str]:
@@ -2125,9 +2882,9 @@ def _validate_event_candidates(
     allowed_keys = {_stable_json(handler) for handler in allowed_handlers}
     for component in components:
         handlers = component.props.get("onClick")
-        if component.component_type == "Button" and handlers is None:
+        if component.component_type in {"Button", "ActionUnit"} and handlers is None:
             raise CompactDslConversionError(
-                f"{component.component_id}: Button requires an onClick event."
+                f"{component.component_id}: component requires an onClick event."
             )
         if not isinstance(handlers, list):
             continue
@@ -2150,12 +2907,25 @@ def _candidate_event_handlers(
     for candidate in candidates:
         if not isinstance(candidate, dict):
             continue
-        call = candidate.get("call")
-        args = candidate.get("args")
-        if not isinstance(call, str) or not isinstance(args, dict):
+        handler = _candidate_event_handler(candidate)
+        if handler is None:
             continue
-        handlers.append({"call": call, "args": args})
+        handlers.append(handler)
     return handlers
+
+
+def _candidate_event_handler(candidate: dict[str, Any]) -> dict[str, Any] | None:
+    call = candidate.get("call")
+    args = candidate.get("args")
+    if not isinstance(call, str) or not isinstance(args, dict):
+        action = candidate.get("action")
+        if not isinstance(action, dict):
+            return None
+        call = action.get("call")
+        args = action.get("args")
+    if not isinstance(call, str) or not isinstance(args, dict):
+        return None
+    return {"call": call, "args": copy.deepcopy(args)}
 
 
 def _stable_json(value: Any) -> str:
@@ -2165,6 +2935,116 @@ def _stable_json(value: Any) -> str:
         sort_keys=True,
         separators=(",", ":"),
     )
+
+
+def _event_handler_replacements(
+    components: list[ComponentRow],
+    task_spec: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    allowed_handlers = _candidate_event_handlers(task_spec)
+    allowed_keys = {_stable_json(handler) for handler in allowed_handlers}
+    replacements: dict[str, dict[str, Any]] = {}
+    for component in components:
+        handlers = component.props.get("onClick")
+        if not isinstance(handlers, list):
+            continue
+        for handler in handlers:
+            if not isinstance(handler, dict):
+                continue
+            key = _stable_json(handler)
+            if key in allowed_keys:
+                continue
+            matched = _matching_event_handler(handler, allowed_handlers)
+            if matched is not None:
+                replacements[key] = copy.deepcopy(matched)
+    return replacements
+
+
+def _matching_event_handler(
+    handler: dict[str, Any],
+    allowed_handlers: list[dict[str, Any]],
+) -> dict[str, Any] | None:
+    call = handler.get("call")
+    args = handler.get("args")
+    if not isinstance(call, str) or not isinstance(args, dict):
+        return None
+    same_call_handlers = [
+        candidate
+        for candidate in allowed_handlers
+        if candidate.get("call") == call
+    ]
+    for candidate in same_call_handlers:
+        candidate_args = candidate.get("args")
+        if isinstance(candidate_args, dict) and _event_args_match(args, candidate_args):
+            return candidate
+    if len(same_call_handlers) == 1:
+        return same_call_handlers[0]
+    return None
+
+
+def _event_args_match(
+    model_args: dict[str, Any],
+    candidate_args: dict[str, Any],
+) -> bool:
+    if _dict_subset(model_args, candidate_args):
+        return True
+    if _dict_subset(candidate_args, model_args):
+        return True
+    return _same_string_arg(model_args, candidate_args, "uri") or _same_string_arg(
+        model_args,
+        candidate_args,
+        "intentName",
+    )
+
+
+def _dict_subset(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    for key, value in left.items():
+        if key not in right:
+            return False
+        right_value = right[key]
+        if isinstance(value, dict) and isinstance(right_value, dict):
+            if not _dict_subset(value, right_value):
+                return False
+            continue
+        if value != right_value:
+            return False
+    return True
+
+
+def _same_string_arg(
+    left: dict[str, Any],
+    right: dict[str, Any],
+    key: str,
+) -> bool:
+    left_value = left.get(key)
+    right_value = right.get(key)
+    return isinstance(left_value, str) and left_value == right_value
+
+
+def _replace_event_handlers(
+    props: dict[str, Any],
+    event_replacements: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    handlers = props.get("onClick")
+    if not event_replacements or not isinstance(handlers, list):
+        return props
+
+    repaired_handlers: list[Any] = []
+    changed = False
+    for handler in handlers:
+        if isinstance(handler, dict):
+            replacement = event_replacements.get(_stable_json(handler))
+            if replacement is not None:
+                repaired_handlers.append(copy.deepcopy(replacement))
+                changed = True
+                continue
+        repaired_handlers.append(copy.deepcopy(handler))
+    if not changed:
+        return props
+
+    repaired_props = copy.deepcopy(props)
+    repaired_props["onClick"] = repaired_handlers
+    return repaired_props
 
 
 def _collect_binding_paths(value: Any, paths: list[str]) -> None:

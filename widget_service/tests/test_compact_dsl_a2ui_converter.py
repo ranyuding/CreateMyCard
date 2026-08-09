@@ -179,8 +179,8 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
         self.assertEqual(components["title"][2]["fontWeight"], 500)
         self.assertEqual(components["title"][2]["fontColor"], "#E5000000")
         self.assertNotIn("design", components["title"][2])
-        self.assertEqual(components["action"][2]["height"], 36)
-        self.assertEqual(components["action"][2]["borderRadius"], 20)
+        self.assertEqual(components["action"][2]["height"], 30)
+        self.assertEqual(components["action"][2]["borderRadius"], 15)
         self.assertEqual(
             components["action"][2]["padding"],
             {"left": 8, "top": 0, "right": 8, "bottom": 0},
@@ -189,8 +189,20 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
         self.assertEqual(components["action"][2]["maxFontSize"], 14)
         self.assertEqual(
             components["action"][2]["backgroundColor"],
-            "#0C000000",
+            "#190A59F7",
         )
+
+    def test_card_title_uses_medium_weight(self) -> None:
+        rows = [
+            ["root", "Column", {"width": 160, "height": 160}, ["title"]],
+            ["title", "Text", {"content": "青浦天气", "design": "card-title"}],
+        ]
+
+        normalized = normalize_compact_dsl_design_tokens(_serialize(rows))
+        title = json.loads(normalized.splitlines()[1])
+
+        self.assertEqual(title[2]["fontSize"], 14)
+        self.assertEqual(title[2]["fontWeight"], 500)
 
     def test_expands_icon_round_design_alias(self) -> None:
         compact_dsl = _serialize(
@@ -212,13 +224,14 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
         normalized = normalize_compact_dsl_design_tokens(compact_dsl)
         action = json.loads(normalized.splitlines()[1])
 
-        self.assertEqual(action[2]["width"], 36)
-        self.assertEqual(action[2]["height"], 36)
-        self.assertEqual(action[2]["borderRadius"], 18)
+        self.assertEqual(action[2]["width"], 30)
+        self.assertEqual(action[2]["height"], 30)
+        self.assertEqual(action[2]["borderRadius"], 15)
         self.assertEqual(action[2]["padding"], 0)
+        self.assertIn("label", action[2])
         self.assertNotIn("design", action[2])
 
-    def test_degrades_button_image_child_to_a2ui_leaf(self) -> None:
+    def test_preserves_button_image_child_for_icon_round(self) -> None:
         event = {
             "call": "clickToApi",
             "args": {"intentName": "Open"},
@@ -257,8 +270,262 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
         normalized = normalize_compact_dsl_design_tokens(compact_dsl)
         rows = [json.loads(line) for line in normalized.splitlines()]
 
-        self.assertEqual([row[0] for row in rows], ["root", "action"])
-        self.assertEqual(len(rows[1]), 3)
+        self.assertEqual([row[0] for row in rows], ["root", "action", "action_icon"])
+        self.assertEqual(rows[1][3], ["action_icon"])
+        validate_compact_dsl_context(
+            compact_dsl,
+            task_spec={
+                "dataModelSchema": {},
+                "assetCandidates": [
+                    {"id": "asset.weather", "src": "resources/base/media/weather.svg"},
+                ],
+                "eventCandidates": [event],
+            },
+            card_spec={"dataBindings": []},
+        )
+        a2ui = convert_compact_dsl_to_a2ui(
+            compact_dsl,
+            size="2x2",
+            protocol_profile=self.profile,
+        )
+        messages = [json.loads(line) for line in a2ui.splitlines()]
+        components = messages[1]["updateComponents"]["components"]
+
+        self.assertEqual(
+            [component["id"] for component in components],
+            ["root", "action", "action_icon"],
+        )
+        self.assertEqual(components[1]["component"], "Stack")
+        self.assertEqual(components[1]["children"], ["action_icon"])
+        self.assertNotIn("label", components[1])
+        self.assertEqual(components[1]["onClick"], [event])
+        self.assertEqual(components[2]["component"], "Image")
+        self.assertEqual(components[2]["src"], "resources/base/media/weather.svg")
+
+    def test_does_not_emit_children_on_standard_button(self) -> None:
+        event = {
+            "call": "clickToApi",
+            "args": {"intentName": "Open"},
+        }
+        compact_dsl = _serialize(
+            [
+                [
+                    "root",
+                    "Column",
+                    {"width": 160, "height": 160},
+                    ["action"],
+                ],
+                [
+                    "action",
+                    "Button",
+                    {
+                        "label": "打开",
+                        "onClick": [
+                            {
+                                "call": event["call"],
+                                "args": event["args"],
+                            }
+                        ],
+                    },
+                    ["action_icon"],
+                ],
+                [
+                    "action_icon",
+                    "Image",
+                    {"src": "resources/base/media/weather.svg"},
+                ],
+            ]
+        )
+
+        a2ui = convert_compact_dsl_to_a2ui(
+            compact_dsl,
+            size="2x2",
+            protocol_profile=self.profile,
+        )
+        messages = [json.loads(line) for line in a2ui.splitlines()]
+        components = messages[1]["updateComponents"]["components"]
+
+        by_id = {component["id"]: component for component in components}
+
+        self.assertEqual(by_id["action"]["component"], "Button")
+        self.assertNotIn("children", by_id["action"])
+
+    def test_reorders_out_of_order_child_component(self) -> None:
+        compact_dsl = _serialize(
+            [
+                [
+                    "root",
+                    "Column",
+                    {"width": 160, "height": 160},
+                    ["action"],
+                ],
+                ["action_icon", "Image", {"src": "resources/base/media/weather.svg"}],
+                [
+                    "action",
+                    "Button",
+                    {"label": "Open", "design": "icon-round"},
+                    ["action_icon"],
+                ],
+            ]
+        )
+
+        normalized = normalize_compact_dsl_design_tokens(compact_dsl)
+        rows = [json.loads(line) for line in normalized.splitlines()]
+
+        self.assertEqual([row[0] for row in rows], ["root", "action", "action_icon"])
+
+    def test_converts_action_unit_icon_round_to_stack(self) -> None:
+        event = {
+            "call": "clickToApi",
+            "args": {"intentName": "CleanMemory"},
+        }
+        compact_dsl = _serialize(
+            [
+                [
+                    "root",
+                    "Column",
+                    {"width": 160, "height": 160},
+                    ["cta"],
+                ],
+                [
+                    "cta",
+                    "ActionUnit",
+                    {
+                        "state": "icon-round",
+                        "icon": "resources/base/media/clean_fill.svg",
+                        "onClick": [event],
+                        "enabled": True,
+                        "actionInk": "font_emphasize",
+                        "flexShrink": 0,
+                    },
+                ],
+            ]
+        )
+
+        validate_compact_dsl_context(
+            compact_dsl,
+            task_spec={
+                "dataModelSchema": {},
+                "assetCandidates": [
+                    {
+                        "id": "asset.clean",
+                        "src": "resources/base/media/clean_fill.svg",
+                    },
+                ],
+                "eventCandidates": [event],
+            },
+            card_spec={"dataBindings": []},
+        )
+        a2ui = convert_compact_dsl_to_a2ui(
+            compact_dsl,
+            size="2x2",
+            protocol_profile=self.profile,
+        )
+        messages = [json.loads(line) for line in a2ui.splitlines()]
+        components = messages[1]["updateComponents"]["components"]
+
+        self.assertEqual(
+            [component["id"] for component in components],
+            ["root", "cta", "cta_icon"],
+        )
+        self.assertEqual(components[1]["component"], "Stack")
+        self.assertEqual(components[1]["children"], ["cta_icon"])
+        self.assertEqual(components[1]["onClick"], [event])
+        self.assertEqual(components[2]["component"], "Image")
+        self.assertEqual(components[2]["src"], "resources/base/media/clean_fill.svg")
+
+    def test_converts_action_unit_capsule_icon_to_centered_row(self) -> None:
+        event = {
+            "call": "clickToApi",
+            "args": {"intentName": "CleanMemory"},
+        }
+        compact_dsl = _serialize(
+            [
+                [
+                    "root",
+                    "Column",
+                    {"width": 160, "height": 160},
+                    ["cta"],
+                ],
+                [
+                    "cta",
+                    "ActionUnit",
+                    {
+                        "state": "capsule",
+                        "label": "一键清理",
+                        "icon": "resources/base/media/clean_fill.svg",
+                        "onClick": [event],
+                        "actionInk": "font_emphasize",
+                        "flexShrink": 0,
+                    },
+                ],
+            ]
+        )
+
+        validate_compact_dsl_context(
+            compact_dsl,
+            task_spec={
+                "dataModelSchema": {},
+                "assetCandidates": [
+                    {
+                        "id": "asset.clean",
+                        "src": "resources/base/media/clean_fill.svg",
+                    },
+                ],
+                "eventCandidates": [event],
+            },
+            card_spec={"dataBindings": []},
+        )
+        a2ui = convert_compact_dsl_to_a2ui(
+            compact_dsl,
+            size="2x2",
+            protocol_profile=self.profile,
+        )
+        messages = [json.loads(line) for line in a2ui.splitlines()]
+        components = messages[1]["updateComponents"]["components"]
+        by_id = {component["id"]: component for component in components}
+
+        self.assertEqual(by_id["cta"]["component"], "Row")
+        self.assertEqual(by_id["cta"]["children"], ["cta_icon", "cta_text"])
+        self.assertEqual(by_id["cta"]["itemMargin"], 4)
+        self.assertEqual(by_id["cta"]["onClick"], [event])
+        self.assertNotIn("enabled", by_id["cta"])
+        self.assertEqual(by_id["cta"]["styles"]["justifyContent"], "center")
+        self.assertEqual(by_id["cta"]["styles"]["alignItems"], "center")
+        self.assertEqual(by_id["cta_icon"]["component"], "Image")
+        self.assertEqual(by_id["cta_icon"]["src"], "resources/base/media/clean_fill.svg")
+        self.assertNotIn("fillColor", by_id["cta_icon"]["styles"])
+        self.assertEqual(by_id["cta_text"]["component"], "Text")
+        self.assertEqual(by_id["cta_text"]["content"], "一键清理")
+        self.assertEqual(by_id["cta_text"]["styles"]["textAlign"], "center")
+
+    def test_action_unit_capsule_ignores_empty_icon(self) -> None:
+        event = {
+            "call": "clickToDeeplink",
+            "args": {"uri": "hww://www.huawei.com/totemweather"},
+        }
+        compact_dsl = _serialize(
+            [
+                [
+                    "root",
+                    "Column",
+                    {"width": 160, "height": 160},
+                    ["cta"],
+                ],
+                [
+                    "cta",
+                    "ActionUnit",
+                    {
+                        "state": "capsule",
+                        "label": "Details",
+                        "icon": "",
+                        "onClick": [event],
+                        "actionInk": "font_emphasize",
+                    },
+                ],
+            ]
+        )
+
         validate_compact_dsl_context(
             compact_dsl,
             task_spec={
@@ -275,12 +542,160 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
         )
         messages = [json.loads(line) for line in a2ui.splitlines()]
         components = messages[1]["updateComponents"]["components"]
+        by_id = {component["id"]: component for component in components}
 
-        self.assertEqual(
-            [component["id"] for component in components],
-            ["root", "action"],
+        self.assertEqual(by_id["cta"]["component"], "Button")
+        self.assertEqual(by_id["cta"]["label"], "Details")
+        self.assertNotIn("children", by_id["cta"])
+
+    def test_keeps_gradient_root_without_decor_layer(self) -> None:
+        compact_dsl = _serialize(
+            [
+                [
+                    "root",
+                    "Column",
+                    {
+                        "width": 160,
+                        "height": 160,
+                        "linearGradient": {
+                            "angle": 145,
+                            "colors": [
+                                ["#FFFFFFFF", 0],
+                                ["#FF86C5E3", 1],
+                            ],
+                        },
+                    },
+                    ["title_icon"],
+                ],
+                [
+                    "title_icon",
+                    "Image",
+                    {"src": "resources/base/media/sun_max.svg"},
+                ],
+            ]
         )
-        self.assertNotIn("children", components[1])
+
+        a2ui = convert_compact_dsl_to_a2ui(
+            compact_dsl,
+            size="2x2",
+            protocol_profile=self.profile,
+        )
+        messages = [json.loads(line) for line in a2ui.splitlines()]
+        components = messages[1]["updateComponents"]["components"]
+
+        self.assertEqual([component["id"] for component in components], ["root", "title_icon"])
+        self.assertEqual(components[0]["component"], "Column")
+        self.assertEqual(components[0]["children"], ["title_icon"])
+        self.assertIn("linearGradient", components[0]["styles"])
+        self.assertEqual(components[1]["component"], "Image")
+        self.assertEqual(components[1]["src"], "resources/base/media/sun_max.svg")
+
+    def test_rejects_empty_standard_button_label(self) -> None:
+        compact_dsl = _serialize(
+            [
+                [
+                    "root",
+                    "Column",
+                    {"width": 160, "height": 160},
+                    ["navigate_btn"],
+                ],
+                [
+                    "navigate_btn",
+                    "Button",
+                    {
+                        "label": "",
+                        "onClick": [
+                            {
+                                "call": "clickToIntent",
+                                "args": {"intentName": "StartNavigate"},
+                            },
+                        ],
+                    },
+                ],
+            ]
+        )
+
+        with self.assertRaisesRegex(
+            CompactDslConversionError,
+            "Button.label must be a non-empty string",
+        ):
+            convert_compact_dsl_to_a2ui(
+                compact_dsl,
+                size="2x2",
+                protocol_profile=self.profile,
+            )
+
+    def test_repairs_unstable_body_action_layout(self) -> None:
+        compact_dsl = _serialize(
+            [
+                [
+                    "root",
+                    "Column",
+                    {"width": 160, "height": 160, "itemMargin": 8},
+                    ["title_area", "body_area"],
+                ],
+                [
+                    "title_area",
+                    "Row",
+                    {"width": "matchParent", "flexShrink": 0},
+                    ["title"],
+                ],
+                ["title", "Text", {"content": "Weather"}],
+                [
+                    "body_area",
+                    "Row",
+                    {
+                        "width": "matchParent",
+                        "layoutWeight": 1,
+                        "alignItems": "bottom",
+                        "itemMargin": 8,
+                    },
+                    ["content_area", "action_area"],
+                ],
+                [
+                    "content_area",
+                    "Column",
+                    {
+                        "width": "matchParent",
+                        "height": "matchParent",
+                        "layoutWeight": 1,
+                        "flexShrink": 1,
+                    },
+                    ["heading", "body"],
+                ],
+                ["heading", "Text", {"content": {"path": "/data/heading"}}],
+                ["body", "Text", {"content": {"path": "/data/body"}}],
+                ["action_area", "Column", {"flexShrink": 0}, ["cta"]],
+                [
+                    "cta",
+                    "Button",
+                    {
+                        "label": "Open",
+                        "width": "matchParent",
+                        "height": 36,
+                        "onClick": [{"call": "clickToApi", "args": {}}],
+                    },
+                ],
+                ["/data/heading", "Sunny"],
+                ["/data/body", "26C"],
+            ]
+        )
+
+        a2ui = convert_compact_dsl_to_a2ui(
+            compact_dsl,
+            size="2x2",
+            protocol_profile=self.profile,
+        )
+        update_components = json.loads(a2ui.splitlines()[1])
+        components = update_components["updateComponents"]["components"]
+        by_id = {component["id"]: component for component in components}
+
+        self.assertEqual(by_id["root"]["children"], ["title_area", "body_area"])
+        self.assertIn("body_area", by_id)
+        self.assertEqual(by_id["content_area"]["styles"]["height"], "matchParent")
+        self.assertNotIn("width", by_id["action_area"]["styles"])
+        self.assertEqual(by_id["cta"]["styles"]["height"], 36)
+        self.assertEqual(by_id["cta"]["styles"]["width"], "matchParent")
 
     def test_removes_empty_children_from_leaf_component(self) -> None:
         compact_dsl = _serialize(
@@ -481,7 +896,8 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
         messages = [json.loads(line) for line in a2ui.splitlines()]
 
         self.assertEqual(len(messages), 3)
-        self.assertEqual(messages[0]["createSurface"]["width"], 140)
+        self.assertEqual(messages[0]["createSurface"]["width"], 160)
+        self.assertEqual(messages[0]["createSurface"]["height"], 160)
         update = messages[1]["updateComponents"]
         self.assertEqual(update["root"], "root")
         components = {}
@@ -609,6 +1025,30 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
                 protocol_profile=self.profile,
             )
 
+    def test_rejects_root_row_for_wide_card(self) -> None:
+        compact_dsl = _serialize(
+            [
+                [
+                    "root",
+                    "Row",
+                    {"width": 320, "height": 160, "itemMargin": 8},
+                    ["title", "value"],
+                ],
+                ["title", "Text", {"content": "通勤助手"}],
+                ["value", "Text", {"content": "09:30"}],
+            ]
+        )
+
+        with self.assertRaisesRegex(
+            CompactDslConversionError,
+            "root Column component is missing",
+        ):
+            convert_compact_dsl_to_a2ui(
+                compact_dsl,
+                size="2x4",
+                protocol_profile=self.profile,
+            )
+
     def test_repairs_trailing_comma_and_missing_eof_closer(self) -> None:
         source_rows = self.compact_dsl.splitlines()
         source_rows[0] = f"{source_rows[0][:-1]},]"
@@ -651,7 +1091,7 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
                 protocol_profile=self.profile,
             )
 
-    def test_uses_2x4_profile_dimensions_for_4x2(self) -> None:
+    def test_emits_surface_dimensions_for_4x2(self) -> None:
         wide_rows = [
             [
                 "root",
@@ -674,10 +1114,10 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
         )
         create_surface = json.loads(result.splitlines()[0])["createSurface"]
 
-        self.assertEqual(create_surface["width"], 300)
-        self.assertEqual(create_surface["height"], 140)
+        self.assertEqual(create_surface["width"], 320)
+        self.assertEqual(create_surface["height"], 160)
 
-    def test_rejects_legacy_action_and_row_space(self) -> None:
+    def test_rejects_legacy_action_and_repairs_row_space(self) -> None:
         legacy_action = _serialize(
             [
                 [
@@ -718,15 +1158,13 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
                 size="2x2",
                 protocol_profile=self.profile,
             )
-        with self.assertRaisesRegex(
-            CompactDslConversionError,
-            "must use itemMargin",
-        ):
-            convert_compact_dsl_to_a2ui(
-                row_space,
-                size="2x2",
-                protocol_profile=self.profile,
-            )
+        result = convert_compact_dsl_to_a2ui(
+            row_space,
+            size="2x2",
+            protocol_profile=self.profile,
+        )
+        root = json.loads(result.splitlines()[1])["updateComponents"]["components"][0]
+        self.assertEqual(root["itemMargin"], 8)
 
     def test_rejects_legacy_spacing_tokens(self) -> None:
         invalid = _serialize(
@@ -999,7 +1437,7 @@ class CompactDslA2uiConverterTest(unittest.TestCase):
 
         with self.assertRaisesRegex(
             CompactDslConversionError,
-            "Image.src",
+            "asset",
         ):
             validate_compact_dsl_context(
                 _serialize(rows),
