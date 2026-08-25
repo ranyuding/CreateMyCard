@@ -5396,6 +5396,8 @@ _PROVIDER_TEMPLATE_DIRECT_VARIANTS = {
     "ScheduleOverview@1": {
         "nextEventFull": "nextEvent",
         "nextEventLocationFull": "nextEvent",
+        "nextEventHero": "nextEvent",
+        "nextEventLocationHero": "nextEvent",
         "meetingCompact": "meetingCompact",
         "meetingLocationCompact": "meetingCompact",
         "meetingSourceCompact": "meetingCompact",
@@ -5407,7 +5409,9 @@ _PROVIDER_TEMPLATE_DIRECT_VARIANTS = {
         "normalFull": "normal",
         "normalHero": "normal",
         "chargingFull": "charging",
+        "chargingHero": "charging",
         "lowFull": "low",
+        "lowHero": "low",
         "normalWideFull": "normal",
         "chargingWideFull": "charging",
         "lowWideFull": "low",

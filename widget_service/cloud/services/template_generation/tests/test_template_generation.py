@@ -117,18 +117,22 @@ def test_all_provider_templates_are_loaded_from_the_isolated_directory():
         if path.is_dir()
     }
 
-    assert len(registry.provider_template_ids) == 92
+    assert len(registry.provider_template_ids) == 96
     assert {
         "ActivityOverviewStepsFull@1",
         "AppUsageOverviewFull@1",
         "BatteryOverviewNormalFull@1",
         "BatteryOverviewNormalHero@1",
+        "BatteryOverviewChargingHero@1",
+        "BatteryOverviewLowHero@1",
         "BluetoothDeviceOverviewCaseFull@1",
         "CountdownOverviewFull@1",
         "DateOverviewFull@1",
         "HeartRateOverviewFull@1",
         "ResourceUsageOverviewFull@1",
         "ScheduleOverviewNextEventFull@1",
+        "ScheduleOverviewNextEventHero@1",
+        "ScheduleOverviewNextEventLocationHero@1",
         "SleepOverviewDurationFull@1",
         "SleepOverviewDurationScoreFull@1",
         "SleepOverviewDurationScoreDetailedFull@1",
@@ -231,7 +235,7 @@ def test_business_groups_are_derived_from_provider_templates() -> None:
     assert provider_layout_components == set(registry.ux_layout_components)
     assert len(registry.ux_business_component_provider_ids) == 11
     calendar = registry.require_ux_business_component("CalendarOverview")
-    assert len(calendar.local_template_ids) == 10
+    assert len(calendar.local_template_ids) == 12
     assert set(calendar.local_template_ids) >= {
         "DateOverviewCompact@1",
         "ScheduleOverviewMeetingCompact@1",
@@ -409,7 +413,7 @@ def test_activity_daily_summary_stacks_supporting_metrics():
     supporting_metrics = next(
         node
         for node in reversed(_template_nodes(root, "Column"))
-        if len(node.children) == 2 and all(child.component == "Row" for child in node.children)
+        if len(node.children) == 2 and all(child.component == "Text" for child in node.children)
     )
 
     assert supporting_metrics.component == "Column"
@@ -417,9 +421,8 @@ def test_activity_daily_summary_stacks_supporting_metrics():
     assert supporting_options["justifyContent"] == "start"
     assert supporting_options.get("alignItems", "start") == "start"
     assert len(supporting_metrics.children) == 2
-    assert all(child.component == "Row" for child in supporting_metrics.children)
     assert all(
-        _template_node_options(child)["alignItems"] == "center"
+        _template_node_options(child)["fontColor"] == "#FF000000"
         for child in supporting_metrics.children
     )
 
@@ -871,12 +874,12 @@ def test_pr7_visual_fixes_are_encoded_in_provider_cardtpl_variants():
     assert "itemMargin" not in _template_node_options(duration_region)
 
     battery = registry.require_variant("BatteryOverviewNormalFull@1", "default").root
-    assert _template_node_options(battery.children[1])["fontColor"] == "#99000000"
+    assert _template_node_options(battery.children[1])["fontColor"] == "#FF000000"
     battery_hero = registry.require_variant("BatteryOverviewNormalHero@1", "default").root
     battery_wide = registry.require_variant("BatteryOverviewNormalWideFull@1", "default").root
     assert _template_node_options(battery_hero)["justifyContent"] == "start"
     assert _template_node_options(battery_wide)["justifyContent"] == "start"
-    assert battery_hero.children[0].component == "Column"
+    assert battery_hero.children[0].component == "Stack"
     assert battery_wide.children[1].component == "Row"
     assert _template_node_options(battery_wide.children[1])["layoutWeight"] == 1
     assert _template_node_options(_template_nodes(battery_hero, "Progress")[0])["width"] == 52
@@ -899,7 +902,7 @@ def test_pr7_visual_fixes_are_encoded_in_provider_cardtpl_variants():
         _template_node_options(node) for node in _template_nodes(activity, "Text")
     ]
     assert all(options.get("fontColor") != "#E6000000" for options in activity_text_options)
-    assert sum(options.get("minFontSize") == 10 for options in activity_text_options) == 2
+    assert sum(options.get("minFontSize") == 10 for options in activity_text_options) == 3
 
 
 def test_calendar_templates_follow_latest_date_schedule_ux_geometry():
@@ -1563,7 +1566,7 @@ async def test_2x2_battery_pill_action_uses_normal_hero_template():
         component_id="BatteryOverview",
         available_template_ids=("BatteryOverviewNormalHero@1",),
         capability_id="GetPhoneBatteryInfo",
-        required_fields=("/batterySOC", "/chargingStatusDesc"),
+        required_fields=("/batterySOC", "/batterySOCText"),
         action_id="event.setPowerSavingMode",
         body=(
             'Template("HeroActionLayout@1",{},'
@@ -1584,11 +1587,10 @@ async def test_2x2_battery_pill_action_uses_normal_hero_template():
     assert model.second_layer_prompt is not None
     second_layer_user = model.second_layer_prompt[1]["content"]
     assert "约 2x1.7；用于 2x2 主内容加一个 PillAction" in second_layer_user
-    assert "selectedActionEventIds` 恰好一个且电量状态为 normal" in second_layer_user
+    assert "selectedActionEventIds` 恰好一个" in second_layer_user
     assert '"height":36' in output.a2ui
     assert "省电模式" in output.a2ui
     assert "batterySOC" in output.a2ui
-    assert "chargingStatusDesc" in output.a2ui
 
 
 def test_battery_normal_hero_requires_a_selected_layout_action():
@@ -2036,6 +2038,7 @@ def _weather_request() -> GenerateWidgetCardRequest:
                     "/current/condition",
                     "/current/airQuality",
                     "/current/coldLevel",
+                    "/daily/0/temperatureRangeText",
                 ],
             }
         ],

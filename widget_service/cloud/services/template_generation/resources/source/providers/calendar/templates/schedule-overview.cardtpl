@@ -45,14 +45,56 @@ Column(
                     {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#66000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                   )
           )
+    )
+)
+#End
+
+#Template ScheduleOverviewNextEventHero@1(props: { sourceIcon?: asset, timeIcon?: asset })
+data = {
+    title: $path("/events/0/title"),
+    startDate: $path("/events/0/startDate"),
+    start: $path("/events/0/dtStart"),
+    end: $path("/events/0/dtEnd")
+}
+
+Column(
+  "compact",
+  {"_advancedComponent": "ScheduleOverview", "width": "100%", "height": "100%", "itemMargin": 14, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+  Text(
+      data.startDate,
+      "compact-title",
+      {"width": "100%", "height": 16, "fontSize": 12, "minFontSize": 12, "fontWeight": 500, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
     ),
-  Stack(
-      "overlay",
-      {"width": "100%", "height": 36, "borderRadius": 18, "backgroundColor": "#1A000000", "alignContent": "center", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
-      Text(
-            "加入会议",
-            "body",
-            {"width": "100%", "fontSize": 14, "minFontSize": 14, "fontWeight": 500, "fontColor": "#FF000000", "textAlign": "center", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+  Row(
+      "between",
+      {"width": "100%", "height": 50, "itemMargin": 8, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+      Column(
+            "compact",
+            {"width": 8, "height": 50, "itemMargin": 4, "justifyContent": "start", "alignItems": "center", "flexShrink": 0, "clip": true},
+            Stack(
+                    "overlay",
+                    {"width": 8, "height": 8, "borderRadius": 4, "borderWidth": 2, "borderColor": "#FF000000", "backgroundColor": "#00FFFFFF", "alignContent": "center", "flexShrink": 0},
+                    Divider(
+                              {"width": 0, "height": 0, "strokeWidth": 0, "color": "#00FFFFFF"}
+                            )
+                  ),
+            Divider(
+                    {"width": 1, "height": 32, "strokeWidth": 1, "vertical": true, "color": "#19000000"}
+                  )
+          ),
+      Column(
+            "compact",
+            {"width": "100%", "height": 50, "layoutWeight": 1, "itemMargin": 2, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+            Text(
+                    data.title,
+                    "title",
+                    {"width": "100%", "height": 16, "fontSize": 12, "minFontSize": 12, "fontWeight": 700, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                  ),
+            Text(
+                    `${data.start} - ${data.end}`,
+                    "subtitle",
+                    {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#66000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                  )
           )
     )
 )
@@ -111,14 +153,62 @@ Column(
                     {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 10, "fontWeight": 400, "fontColor": "#66000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                   ),
           )
+    )
+)
+#End
+
+#Template ScheduleOverviewNextEventLocationHero@1(props: { sourceIcon?: asset, timeIcon?: asset, locationIcon?: asset })
+data = {
+    title: $path("/events/0/title"),
+    location: $path("/events/0/eventLocation"),
+    startDate: $path("/events/0/startDate"),
+    start: $path("/events/0/dtStart"),
+    end: $path("/events/0/dtEnd")
+}
+
+Column(
+  "compact",
+  {"_advancedComponent": "ScheduleOverview", "width": "100%", "height": "100%", "itemMargin": 14, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+  Text(
+      data.startDate,
+      "compact-title",
+      {"width": "100%", "height": 16, "fontSize": 12, "minFontSize": 12, "fontWeight": 500, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
     ),
-  Stack(
-      "overlay",
-      {"width": "100%", "height": 36, "borderRadius": 18, "backgroundColor": "#1A000000", "alignContent": "center", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
-      Text(
-            "加入会议",
-            "body",
-            {"width": "100%", "fontSize": 14, "minFontSize": 14, "fontWeight": 500, "fontColor": "#FF000000", "textAlign": "center", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+  Row(
+      "between",
+      {"width": "100%", "height": 50, "itemMargin": 8, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+      Column(
+            "compact",
+            {"width": 8, "height": 50, "itemMargin": 4, "justifyContent": "start", "alignItems": "center", "flexShrink": 0, "clip": true},
+            Stack(
+                    "overlay",
+                    {"width": 8, "height": 8, "borderRadius": 4, "borderWidth": 2, "borderColor": "#FF000000", "backgroundColor": "#00FFFFFF", "alignContent": "center", "flexShrink": 0},
+                    Divider(
+                              {"width": 0, "height": 0, "strokeWidth": 0, "color": "#00FFFFFF"}
+                            )
+                  ),
+            Divider(
+                    {"width": 1, "height": 32, "strokeWidth": 1, "vertical": true, "color": "#19000000"}
+                  )
+          ),
+      Column(
+            "compact",
+            {"width": "100%", "height": 50, "layoutWeight": 1, "itemMargin": 2, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+            Text(
+                    data.title,
+                    "title",
+                    {"width": "100%", "height": 16, "fontSize": 12, "minFontSize": 12, "fontWeight": 700, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                  ),
+            Text(
+                    `${data.start} - ${data.end}`,
+                    "subtitle",
+                    {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#66000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                  ),
+            Text(
+                    data.location,
+                    "subtitle",
+                    {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 10, "fontWeight": 400, "fontColor": "#66000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                  ),
           )
     )
 )
