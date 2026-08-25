@@ -791,7 +791,7 @@ Column(
 #Template BatteryOverviewLowPowerSavingHero@1(props: { batteryIcon?: asset })
 data = {
     percent: $path("/batterySOC"),
-    level: $path("/batteryCapacityLevelDesc")
+    percentText: $path("/batterySOCText")
 }
 
 Column(
@@ -822,7 +822,7 @@ Column(
           )
     ),
   Text(
-      data.level,
+      `手机电量剩余${data.percentText}`,
       "body",
       {"width": "matchParent", "fontSize": 13, "minFontSize": 11, "fontWeight": 500, "maxLines": 1, "textAlign": "center", "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
     )

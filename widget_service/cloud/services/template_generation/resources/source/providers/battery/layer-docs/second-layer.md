@@ -8,7 +8,7 @@
   - `BatteryOverviewChargingFull@1`：手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：charging。 布局场景：完整 2x2；单独使用，或加一个 IconAction。主数据：/batterySOC, /batterySOCText；次要数据：/chargingStatusDesc, /batteryCapacityLevelDesc；可选数据：无。
   - `BatteryOverviewLowFull@1`：手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：low。 布局场景：完整 2x2；单独使用，或加一个 IconAction。主数据：/batterySOC, /batterySOCText；次要数据：/chargingStatusDesc, /batteryCapacityLevelDesc；可选数据：无。
   - `BatteryOverviewLowPowerSavingFull@1`：省电模式提示 Full，居中展示电量环、电量等级和百分比文本；不内置行动按钮。 组件形态：powerSaving。 布局场景：完整 2x2；单独使用，或加一个 IconAction。主数据：/batterySOC, /batterySOCText；次要数据：/batteryCapacityLevelDesc；可选数据：无。
-  - `BatteryOverviewLowPowerSavingHero@1`：省电模式提示 Hero，居中展示电量环和电量等级，用于第二层组合一个 PillAction。 组件形态：powerSavingHero。 布局场景：约 2x1.7；主数据：/batterySOC；次要数据：/batteryCapacityLevelDesc；可选数据：无。
+  - `BatteryOverviewLowPowerSavingHero@1`：省电模式提示 Hero，居中展示电量环和剩余电量文本，用于第二层组合一个 PillAction。 组件形态：powerSavingHero。 布局场景：约 2x1.7；主数据：/batterySOC, /batterySOCText；次要数据：无；可选数据：无。
   - `BatteryOverviewNormalWideFull@1`：手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：normalWide。 布局场景：完整 4x2；单独使用。主数据：/batterySOC, /batterySOCText；次要数据：/chargingStatusDesc, /batteryCapacityLevelDesc；可选数据：无。
   - `BatteryOverviewChargingWideFull@1`：手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：chargingWide。 布局场景：完整 4x2；单独使用。主数据：/batterySOC, /batterySOCText；次要数据：/chargingStatusDesc, /batteryCapacityLevelDesc；可选数据：无。
   - `BatteryOverviewLowWideFull@1`：手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：lowWide。 布局场景：完整 4x2；单独使用。主数据：/batterySOC, /batterySOCText；次要数据：/chargingStatusDesc, /batteryCapacityLevelDesc；可选数据：无。

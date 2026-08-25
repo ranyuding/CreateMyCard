@@ -103,15 +103,14 @@
       "templateId": "BatteryOverviewLowPowerSavingHero@1",
       "businessId": "BatteryOverview",
       "capabilityId": "GetPhoneBatteryInfo",
-      "description": "省电模式提示 Hero；居中展示电量环和电量等级，用于第二层组合一个 PillAction。 组件形态：powerSavingHero。",
+      "description": "省电模式提示 Hero；居中展示电量环和剩余电量文本，用于第二层组合一个 PillAction。 组件形态：powerSavingHero。",
       "optionalData": [],
       "entry": "templates/battery-overview.cardtpl",
       "primaryData": [
-        "/batterySOC"
+        "/batterySOC",
+        "/batterySOCText"
       ],
-      "secondaryData": [
-        "/batteryCapacityLevelDesc"
-      ]
+      "secondaryData": []
     },
     {
       "templateId": "BatteryOverviewNormalWideFull@1",
