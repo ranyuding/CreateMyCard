@@ -123,7 +123,7 @@ def test_all_provider_templates_are_loaded_from_the_isolated_directory():
         "AppUsageOverviewFull@1",
         "BatteryOverviewNormalFull@1",
         "BatteryOverviewNormalHero@1",
-        "BatteryOverviewLowPowerSavingHero@1",
+        "BatteryOverviewPercentRingHero@1",
         "BluetoothDeviceOverviewCaseFull@1",
         "CountdownOverviewFull@1",
         "DateOverviewFull@1",
@@ -1597,7 +1597,7 @@ async def test_2x2_battery_pill_action_uses_normal_hero_template():
 
 
 @pytest.mark.asyncio
-async def test_2x2_low_power_saving_uses_hero_plus_pill_action_theme():
+async def test_2x2_battery_percent_ring_hero_uses_pill_action_theme():
     binding = CandidateDataBinding(
         capabilityId="GetPhoneBatteryInfo",
         writeResultTo="/data/phoneBattery",
@@ -1611,13 +1611,13 @@ async def test_2x2_low_power_saving_uses_hero_plus_pill_action_theme():
     model = _FixedTemplateModel(
         theme_id="system-low-power-blue",
         component_id="BatteryOverview",
-        available_template_ids=("BatteryOverviewLowPowerSavingHero@1",),
+        available_template_ids=("BatteryOverviewPercentRingHero@1",),
         capability_id="GetPhoneBatteryInfo",
         required_fields=("/batterySOC", "/batterySOCText"),
         action_id="event.setPowerSavingMode",
         body=(
             'Template("HeroActionLayout@1",{},'
-            'Template("BatteryOverviewLowPowerSavingHero@1",'
+            'Template("BatteryOverviewPercentRingHero@1",'
             '{"batteryIcon":"resources/base/media/battery_leaf_fill.svg"}),'
             'PillAction({"actionId":"event.setPowerSavingMode"}));'
         ),
@@ -1626,13 +1626,13 @@ async def test_2x2_low_power_saving_uses_hero_plus_pill_action_theme():
     output = await generate_template_a2ui(
         _battery_task().model_copy(
             update={
-                "userQuery": "手机电量低于20%，开启省电模式",
+                "userQuery": "手机电量剩余68%，开启省电模式",
                 "dataModelSchema": {
                     "data": {
                         "phoneBattery": {
-                            "batterySOC": _provider_field(16, "integer"),
-                            "batterySOCText": _provider_field("16%", "string"),
-                            "batteryCapacityLevelDesc": _provider_field("低电量", "string"),
+                            "batterySOC": _provider_field(68, "integer"),
+                            "batterySOCText": _provider_field("68%", "string"),
+                            "batteryCapacityLevelDesc": _provider_field("正常电量", "string"),
                             "chargingStatusDesc": _provider_field("未充电", "string"),
                         }
                     }
@@ -1644,7 +1644,7 @@ async def test_2x2_low_power_saving_uses_hero_plus_pill_action_theme():
         model,
     )
 
-    assert output.template_ids == ("BatteryOverviewLowPowerSavingHero@1", "HeroActionLayout@1")
+    assert output.template_ids == ("BatteryOverviewPercentRingHero@1", "HeroActionLayout@1")
     assert "BatteryOverviewLowPowerSavingFull@1" not in output.a2ui
     assert "#FF99661F" in output.a2ui
     assert "#FFFFF3E6" in output.a2ui

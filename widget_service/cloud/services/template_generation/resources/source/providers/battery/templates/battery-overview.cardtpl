@@ -741,7 +741,7 @@ Column(
 )
 #End
 
-#Template BatteryOverviewLowPowerSavingHero@1(props: { batteryIcon?: asset })
+#Template BatteryOverviewPercentRingHero@1(props: { batteryIcon?: asset })
 data = {
     percent: $path("/batterySOC"),
     percentText: $path("/batterySOCText")

@@ -68,10 +68,10 @@ def test_template_preview_assets_are_bundled_by_genui_evaluation():
     }
 
 
-def test_low_power_saving_hero_preview_is_neutral_skeleton_layout():
+def test_battery_percent_ring_hero_preview_is_neutral_skeleton_layout():
     cases = build_template_preview_cases()
     case = next(
-        case for case in cases if case.template_id == "BatteryOverviewLowPowerSavingHero@1"
+        case for case in cases if case.template_id == "BatteryOverviewPercentRingHero@1"
     )
     components = case.messages[1]["updateComponents"]["components"]
     by_id = {component["id"]: component for component in components}

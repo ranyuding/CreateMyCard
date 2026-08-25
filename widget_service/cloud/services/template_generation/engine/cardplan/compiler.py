@@ -911,7 +911,11 @@ def _validate_provider_template_state(
         wire_id, variant_name = identity
     if wire_id == "BatteryOverview@1":
         facts = extract_battery_overview_facts(task_spec.dataModelSchema)
-        if facts is None or not variant_name.startswith(facts.state):
+        state_neutral_variants = {"percentRingHero"}
+        if facts is None or (
+            variant_name not in state_neutral_variants
+            and not variant_name.startswith(facts.state)
+        ):
             raise TerseDslNested2ConversionError(
                 "Battery Provider Template variant does not match the trusted state."
             )
@@ -8619,7 +8623,7 @@ def _apply_provider_template_theme_colors(
     definition: TemplateDefinition,
     theme: Any,
 ) -> Nested2Node:
-    if definition.wire_id != "BatteryOverviewLowPowerSavingHero@1":
+    if definition.wire_id != "BatteryOverviewPercentRingHero@1":
         return node
     content = (
         theme.action_style.font_color
@@ -8628,11 +8632,11 @@ def _apply_provider_template_theme_colors(
         if theme.text_role == "text-on-accent"
         else _FONT_PRIMARY
     )
-    return _tint_low_power_saving_hero(node, content)
+    return _tint_percent_ring_hero(node, content)
 
 
-def _tint_low_power_saving_hero(node: Nested2Node, content_color: str) -> Nested2Node:
-    children = tuple(_tint_low_power_saving_hero(child, content_color) for child in node.children)
+def _tint_percent_ring_hero(node: Nested2Node, content_color: str) -> Nested2Node:
+    children = tuple(_tint_percent_ring_hero(child, content_color) for child in node.children)
     values = list(node.values)
     options_index = next(
         (index for index, value in enumerate(values) if isinstance(value, dict)),
