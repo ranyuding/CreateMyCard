@@ -20,7 +20,7 @@ Column(
       Text(
             "今日活动",
             "subtitle",
-            {"width": "matchParent", "fontSize": 12, "fontWeight": 500, "fontColor": "#FFFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+            {"width": "matchParent", "fontSize": 12, "fontWeight": 500, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
           )
     ),
   Row(
@@ -29,12 +29,12 @@ Column(
       Text(
             data.steps,
             "title",
-            {"fontSize": 38, "fontWeight": 800, "fontColor": "#FFFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+            {"fontSize": 38, "fontWeight": 800, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
           ),
       Text(
             "步",
             "subtitle",
-            {"fontSize": 12, "fontWeight": 500, "fontColor": "#CCFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+            {"fontSize": 12, "fontWeight": 500, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
           )
     )
 )
@@ -91,21 +91,21 @@ data = {
 
 Column(
   "compact",
-  {"_advancedComponent": "ActivityOverview", "width": "matchParent", "height": "matchParent", "padding": 12, "borderRadius": 20, "clip": true, "linearGradient": {"direction": "RightBottom", "colors": [["#FFF4AD16", 0.48], ["#FFFFDCAE", 1]]}, "itemMargin": 0, "justifyContent": "start", "alignItems": "start", "constraintSize": {"minWidth": 0, "minHeight": 0}},
+  {"_advancedComponent": "ActivityOverview", "width": "matchParent", "height": "matchParent", "padding": 12, "borderRadius": 20, "clip": true, "itemMargin": 0, "justifyContent": "start", "alignItems": "start", "constraintSize": {"minWidth": 0, "minHeight": 0}},
   Row(
       "between",
       {"width": "matchParent", "height": 24, "itemMargin": 8, "justifyContent": "spaceBetween", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
       Text(
             "今日步数",
             "compact-title",
-            {"width": "matchParent", "height": 16, "fontSize": 12, "minFontSize": 12, "fontWeight": 600, "fontColor": "#99FFFFFF", "opacity": 0.6, "maxLines": 1, "textOverflow": "ellipsis", "layoutWeight": 1, "constraintSize": {"minWidth": 0, "minHeight": 0}}
+            {"width": "matchParent", "height": 16, "fontSize": 12, "minFontSize": 12, "fontWeight": 600, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "layoutWeight": 1, "constraintSize": {"minWidth": 0, "minHeight": 0}}
           ),
       IfPresent(
             props.stepsIcon,
             Image(
                     props.stepsIcon,
                     "icon",
-                    {"width": 20, "height": 20, "objectFit": "contain", "flexShrink": 0, "fillColor": "#FFFFFFFF", "_preserveOriginalColor": true}
+                    {"width": 20, "height": 20, "objectFit": "contain", "flexShrink": 0, "fillColor": "#FF000000"}
                   )
           )
     ),
@@ -118,16 +118,16 @@ Column(
             Text(
                     data.steps,
                     "title",
-                    {"width": 76, "height": 32, "fontSize": 30, "minFontSize": 24, "fontWeight": 800, "fontColor": "#FFFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                    {"width": 76, "height": 32, "fontSize": 30, "minFontSize": 24, "fontWeight": 800, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                   ),
             Text(
                     "步",
                     "subtitle",
-                    {"width": 12, "height": 16, "fontSize": 12, "minFontSize": 10, "fontWeight": 600, "fontColor": "#99FFFFFF", "opacity": 0.6, "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                    {"width": 12, "height": 16, "fontSize": 12, "minFontSize": 10, "fontWeight": 600, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                   )
           ),
       Progress(
-            {"value": data.steps, "total": 10000, "color": "#FFFFFFFF", "backgroundColor": "#33FFFFFF", "strokeWidth": 8, "height": 8, "width": "matchParent", "borderRadius": 20}
+            {"value": data.steps, "total": 10000, "color": "#FF000000", "backgroundColor": "#33000000", "strokeWidth": 8, "height": 8, "width": "matchParent", "borderRadius": 20}
           )
     ),
   Column(
@@ -136,12 +136,12 @@ Column(
       Text(
             `运动距离 ${data.distance}`,
             "body",
-            {"width": 113, "height": 16, "fontSize": 12, "minFontSize": 10, "fontWeight": 700, "fontColor": "#FFFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+            {"width": 113, "height": 16, "fontSize": 12, "minFontSize": 10, "fontWeight": 700, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
           ),
       Text(
             `消耗热量 ${data.calories}`,
             "body",
-            {"width": 113, "height": 16, "fontSize": 12, "minFontSize": 10, "fontWeight": 700, "fontColor": "#FFFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+            {"width": 113, "height": 16, "fontSize": 12, "minFontSize": 10, "fontWeight": 700, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
           )
     )
 )
@@ -177,7 +177,7 @@ Row(
                     Text(
                               "今日活动",
                               "subtitle",
-                              {"width": "matchParent", "fontSize": 12, "fontWeight": 500, "fontColor": "#FFFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                              {"width": "matchParent", "fontSize": 12, "fontWeight": 500, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                             )
                   ),
             Row(
@@ -186,12 +186,12 @@ Row(
                     Text(
                               data.steps,
                               "title",
-                              {"fontSize": 38, "fontWeight": 800, "fontColor": "#FFFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                              {"fontSize": 38, "fontWeight": 800, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                             ),
                     Text(
                               "步",
                               "subtitle",
-                              {"fontSize": 12, "fontWeight": 500, "fontColor": "#CCFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                              {"fontSize": 12, "fontWeight": 500, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                             )
                   )
           )
@@ -216,7 +216,7 @@ Row(
                     Text(
                               data.calories,
                               "body",
-                              {"width": "matchParent", "fontSize": 12, "minFontSize": 10, "fontWeight": 500, "fontColor": "#FFFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                              {"width": "matchParent", "fontSize": 12, "minFontSize": 10, "fontWeight": 500, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                             )
                   ),
             Row(
@@ -233,7 +233,7 @@ Row(
                     Text(
                               data.distance,
                               "body",
-                              {"width": "matchParent", "fontSize": 12, "minFontSize": 10, "fontWeight": 500, "fontColor": "#FFFFFFFF", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                              {"width": "matchParent", "fontSize": 12, "minFontSize": 10, "fontWeight": 500, "fontColor": "#FF000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                             )
                   )
           )
