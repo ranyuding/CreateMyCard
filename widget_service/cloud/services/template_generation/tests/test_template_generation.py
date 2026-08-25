@@ -1645,6 +1645,7 @@ async def test_2x2_battery_percent_ring_hero_uses_pill_action_theme():
     )
 
     assert output.template_ids == ("BatteryOverviewPercentRingHero@1", "HeroActionLayout@1")
+    assert model.second_layer_prompt is None
     assert "BatteryOverviewLowPowerSavingFull@1" not in output.a2ui
     assert "#FF99661F" in output.a2ui
     assert "#FFFFF3E6" in output.a2ui

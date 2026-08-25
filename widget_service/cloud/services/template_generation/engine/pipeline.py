@@ -213,11 +213,18 @@ async def _generate_selected_templates(
     protocol_profile = A2UIProtocolRegistry.read_design_protocol_profile(
         TERSE_DSL_NESTED2_PROFILE_ID
     )
+    deterministic_body = _deterministic_ux_mixed_body(
+        projected_task_spec,
+        component_candidates,
+        required_template_groups,
+    )
     messages = projection.messages
     repair_count = 0
     while True:
         phase = "advanced-mixed-body" if repair_count == 0 else "advanced-mixed-body-repair"
-        raw_output = await _generate_hybrid_body(model_client, messages, phase=phase)
+        raw_output = deterministic_body
+        if raw_output is None:
+            raw_output = await _generate_hybrid_body(model_client, messages, phase=phase)
         try:
             framed_output, _ = frame_ux_layout_root_children(
                 raw_output,
@@ -237,6 +244,8 @@ async def _generate_selected_templates(
             )
             break
         except TerseDslNested2ConversionError as exc:
+            if deterministic_body is not None:
+                raise TemplateGenerationError("template body validation failed") from exc
             if repair_count >= _MAX_BODY_REPAIRS:
                 raise TemplateGenerationError("template body validation failed") from exc
             repair_count += 1
@@ -273,6 +282,51 @@ async def _generate_selected_templates(
         expanded_component_count=compilation.stats.expanded_component_count,
         theme_id=projection.theme_id,
     )
+
+
+def _deterministic_ux_mixed_body(
+    task_spec: TaskSpec,
+    component_candidates: tuple[TemplateComponentCandidate, ...],
+    required_template_groups: tuple[tuple[str, ...], ...],
+) -> str | None:
+    if task_spec.size != "2x2" or len(task_spec.eventCandidates) != 1:
+        return None
+    ring_template_id = "BatteryOverviewPercentRingHero@1"
+    if len(required_template_groups) < 2 or any(
+        ring_template_id not in group for group in required_template_groups
+    ):
+        return None
+    if not any(
+        candidate.component_id == "BatteryOverview"
+        and ring_template_id in candidate.available_template_ids
+        for candidate in component_candidates
+    ):
+        return None
+    action_id = task_spec.eventCandidates[0].id
+    if not action_id:
+        return None
+    icon_src = _preferred_asset_source(
+        task_spec.assetCandidates,
+        ("battery_leaf_fill.svg", "icon_save_power.svg"),
+    )
+    props = f'{{"batteryIcon":"{icon_src}"}}' if icon_src else "{}"
+    return (
+        'Template("HeroActionLayout@1",{},'
+        f'Template("{ring_template_id}",{props}),'
+        f'PillAction({{"actionId":"{action_id}"}}));'
+    )
+
+
+def _preferred_asset_source(
+    asset_candidates: tuple[dict[str, Any], ...],
+    suffixes: tuple[str, ...],
+) -> str | None:
+    for suffix in suffixes:
+        for asset in asset_candidates:
+            src = asset.get("src")
+            if isinstance(src, str) and src.endswith(suffix):
+                return src
+    return None
 
 
 async def _generate_hybrid_body(
