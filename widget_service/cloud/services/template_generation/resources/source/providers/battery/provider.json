@@ -85,21 +85,6 @@
       ]
     },
     {
-      "templateId": "BatteryOverviewLowPowerSavingFull@1",
-      "businessId": "BatteryOverview",
-      "capabilityId": "GetPhoneBatteryInfo",
-      "description": "省电模式提示 Full；居中展示电量环、电量等级和百分比文本，不内置行动按钮。 组件形态：powerSaving。",
-      "optionalData": [],
-      "entry": "templates/battery-overview.cardtpl",
-      "primaryData": [
-        "/batterySOC",
-        "/batterySOCText"
-      ],
-      "secondaryData": [
-        "/batteryCapacityLevelDesc"
-      ]
-    },
-    {
       "templateId": "BatteryOverviewLowPowerSavingHero@1",
       "businessId": "BatteryOverview",
       "capabilityId": "GetPhoneBatteryInfo",

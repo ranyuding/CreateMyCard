@@ -133,7 +133,7 @@
     },
     {
       "themeProfileId": "system-low-power-blue",
-      "description": "系统低电蓝",
+      "description": "系统低电琥珀（兼容历史主题标识）",
       "firstLayerRule": {"path": "themes/system-low-power-blue/first-layer.md"},
       "supportedCapabilityIds": [
         "GetPhoneBatteryInfo"
@@ -146,7 +146,7 @@
       "density": "normal",
       "rootComponent": "Column",
       "rootStyles": {
-        "backgroundColor": "#FFFFFFFF",
+        "backgroundColor": "#FF99661F",
         "borderRadius": 20,
         "padding": 11,
         "justifyContent": "spaceBetween",
@@ -155,11 +155,11 @@
           "direction": "Bottom",
           "colors": [
             [
-              "#1AF9A01E",
+              "#FF99661F",
               0
             ],
             [
-              "#00FFFFFF",
+              "#FF99661F",
               1
             ]
           ]
@@ -167,8 +167,8 @@
         "clip": true
       },
       "actionStyle": {
-        "backgroundColor": "#FFF9A01E",
-        "fontColor": "#FFFFFFFF",
+        "backgroundColor": "#33FFF3E6",
+        "fontColor": "#FFFFF3E6",
         "height": 28,
         "borderRadius": 14,
         "fontSize": 14,

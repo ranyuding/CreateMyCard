@@ -875,6 +875,12 @@ def _expand_call(
             binding_values,
             spread_children=expanded_children,
         )
+    if definition.source_format == "cardtpl/1":
+        root = _apply_provider_template_theme_colors(
+            root,
+            definition,
+            registry.require_theme(contract.theme_profile_id),
+        )
     root, action_ids = _bind_template_actions(root, contract)
     node_count, depth = _shape(root)
     if (
@@ -8606,6 +8612,51 @@ def _normalize_theme_styles(styles: dict[str, Any]) -> dict[str, Any]:
         else:
             normalized[key] = value
     return normalized
+
+
+def _apply_provider_template_theme_colors(
+    node: Nested2Node,
+    definition: TemplateDefinition,
+    theme: Any,
+) -> Nested2Node:
+    if definition.wire_id != "BatteryOverviewLowPowerSavingHero@1":
+        return node
+    content = (
+        theme.action_style.font_color
+        if theme.action_style is not None
+        else "#FFFFFFFF"
+        if theme.text_role == "text-on-accent"
+        else _FONT_PRIMARY
+    )
+    return _tint_low_power_saving_hero(node, content)
+
+
+def _tint_low_power_saving_hero(node: Nested2Node, content_color: str) -> Nested2Node:
+    children = tuple(_tint_low_power_saving_hero(child, content_color) for child in node.children)
+    values = list(node.values)
+    options_index = next(
+        (index for index, value in enumerate(values) if isinstance(value, dict)),
+        None,
+    )
+    if options_index is None:
+        return Nested2Node(node.component_type, tuple(values), children)
+    options = dict(values[options_index])
+    if node.component_type == "Text":
+        options["fontColor"] = content_color
+    elif node.component_type == "Image":
+        options["fillColor"] = content_color
+    elif node.component_type == "Progress" and options.get("type") == "ring":
+        options["color"] = content_color
+        options["backgroundColor"] = _color_with_alpha(content_color, 0.2)
+    values[options_index] = options
+    return Nested2Node(node.component_type, tuple(values), children)
+
+
+def _color_with_alpha(color: str, opacity: float) -> str:
+    if not color.startswith("#") or len(color) != 9:
+        return color
+    alpha = max(0, min(255, round(255 * opacity)))
+    return f"#{alpha:02X}{color[-6:]}"
 
 
 def _column_align_items(value: Any) -> Any:
