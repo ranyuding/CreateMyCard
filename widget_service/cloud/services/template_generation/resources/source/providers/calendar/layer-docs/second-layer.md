@@ -11,10 +11,10 @@
 - 可用模板：
   - `DateOverviewCompact@1`：首个日程日期的上半区主视觉。 组件形态：compactDate。 布局场景：约 2x1；优先与一个日程 Compact 纵向组合，也可与另一 Compact 组合。主数据：/events/0/startDate；次要数据：/updatedAt；可选数据：无。
   - `DateOverviewFull@1`：首个日程日期主视觉与数据更新时间。 组件形态：dateHero。 布局场景：完整 2x2；单独使用，或加一个 IconAction。主数据：/events/0/startDate；次要数据：/updatedAt；可选数据：无。
-  - `ScheduleOverviewNextEventFull@1`：会议/日程 Full，标题区显示日期，内容区为左侧时间轴和会议标题时间，不包含动作按钮。 组件形态：nextEvent。 布局场景：完整 2x2；单独使用，或加一个 IconAction。主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/dtEnd, /events/0/startDate；可选数据：无。
-  - `ScheduleOverviewNextEventHero@1`：会议/日程 Hero，标题区显示日期，内容区为左侧时间轴和会议标题时间；动作按钮由第二层追加 PillAction。 组件形态：nextEventHero。 布局场景：约 2x1.7；用于 2x2 主内容加一个 PillAction。主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/dtEnd, /events/0/startDate；可选数据：无。
-  - `ScheduleOverviewNextEventLocationFull@1`：会议/日程地点 Full，标题区显示日期，内容区为左侧时间轴和会议标题、时间、地点，不包含动作按钮。 组件形态：nextEventLocation。 布局场景：完整 2x2；单独使用，或加一个 IconAction。主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/eventLocation, /events/0/dtEnd, /events/0/startDate；可选数据：无。
-  - `ScheduleOverviewNextEventLocationHero@1`：会议/日程地点 Hero，标题区显示日期，内容区为左侧时间轴和会议标题、时间、地点；动作按钮由第二层追加 PillAction。 组件形态：nextEventLocationHero。 布局场景：约 2x1.7；用于 2x2 主内容加一个 PillAction。主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/eventLocation, /events/0/dtEnd, /events/0/startDate；可选数据：无。
+  - `ScheduleOverviewNextEventFull@1`：首个日程摘要，展示标题和时间，可补充结束时间与地点。 组件形态：nextEvent。 布局场景：完整 2x2；单独使用，或加一个 IconAction。主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/dtEnd；可选数据：无。
+  - `ScheduleOverviewNextEventLocationFull@1`：首个日程摘要，展示标题和时间，可补充结束时间与地点。 组件形态：nextEventLocation。 布局场景：完整 2x2；单独使用，或加一个 IconAction。主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/eventLocation, /events/0/dtEnd；可选数据：无。
+  - `ScheduleOverviewMeetingCardFull@1`：会议日程 Full，标题区展示日程日期，内容区展示会议标题、时间和地点；不内置行动按钮。 组件形态：meetingCard。 布局场景：完整 2x2；单独使用，或加一个 IconAction。主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/startDate, /events/0/eventLocation, /events/0/dtEnd；可选数据：无。
+  - `ScheduleOverviewMeetingCardHero@1`：会议日程 Hero，内容同 meetingCard，用于第二层组合一个 PillAction。 组件形态：meetingCardHero。 布局场景：约 2x1.7；主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/startDate, /events/0/eventLocation, /events/0/dtEnd；可选数据：无。
   - `ScheduleOverviewMeetingCompact@1`：首个日程摘要，展示标题和时间，可补充结束时间与地点。 组件形态：meetingCompact。 布局场景：约 2x1；用于双 Compact 组合，或单 Compact 加两个 PillAction。主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/dtEnd；可选数据：无。
   - `ScheduleOverviewMeetingLocationCompact@1`：首个日程摘要，展示标题和时间，可补充结束时间与地点。 组件形态：meetingCompactLocation。 布局场景：约 2x1；用于双 Compact 组合，或单 Compact 加两个 PillAction。主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/eventLocation, /events/0/dtEnd；可选数据：无。
   - `ScheduleOverviewMeetingWideFull@1`：首个日程摘要，展示标题和时间，可补充结束时间与地点。 组件形态：meetingExpanded。 布局场景：完整 4x2；单独使用。主数据：/events/0/title, /events/0/dtStart；次要数据：/events/0/eventLocation, /events/0/dtEnd；可选数据：无。
@@ -28,6 +28,6 @@
   - `sourceIcon`：日历应用、日程来源或会议来源语义，不是时间或地点图标。
   - `timeIcon`：时钟、时间或日程时刻语义。
   - `locationIcon`：地点、位置、会议室或地图标记语义。
-- 当目标尺寸为 `2x2` 且 `selectedActionEventIds` 恰好一个时，必须选择满足字段要求的
-  `ScheduleOverview*Hero@1`，并放入带末尾 `PillAction` 的 `HeroActionLayout@1`；模板本身不得输出
-  `加入会议` 等动作按钮文案。无动作的 2x2 选择对应 `ScheduleOverview*Full@1`。
+- 当目标尺寸为 `2x2` 且 `selectedActionEventIds` 恰好一个时，按钮只能由第二层输出
+  `PillAction@1` 并放入 `HeroActionLayout@1`，会议/加入会议类意图优先选择
+  `ScheduleOverviewMeetingCardHero@1` 作为 Hero 内容。

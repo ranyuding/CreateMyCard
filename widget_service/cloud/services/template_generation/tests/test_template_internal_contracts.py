@@ -72,11 +72,6 @@ def test_provider_template_layout_suffix_combinations_are_enforced() -> None:
         "2x2",
     )
     _validate_provider_template_layout_action_requirements(
-        (template("ScheduleOverviewNextEventHero@1"),),
-        (pill_one,),
-        "2x2",
-    )
-    _validate_provider_template_layout_action_requirements(
         (template("WeatherOverviewFull@1"),),
         (icon,),
         "2x2",

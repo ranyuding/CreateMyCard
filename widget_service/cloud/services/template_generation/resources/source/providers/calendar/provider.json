@@ -51,7 +51,7 @@
       "templateId": "ScheduleOverviewNextEventFull@1",
       "businessId": "CalendarOverview",
       "capabilityId": "GetCalendarEvents",
-      "description": "会议/日程 Full；标题区显示日期，内容区为左侧时间轴和会议标题时间，不包含动作按钮。 组件形态：nextEvent。",
+      "description": "首个日程摘要，展示标题和时间，可补充结束时间与地点。 组件形态：nextEvent。",
       "optionalData": [],
       "entry": "templates/schedule-overview.cardtpl",
       "primaryData": [
@@ -59,31 +59,14 @@
         "/events/0/dtStart"
       ],
       "secondaryData": [
-        "/events/0/dtEnd",
-        "/events/0/startDate"
-      ]
-    },
-    {
-      "templateId": "ScheduleOverviewNextEventHero@1",
-      "businessId": "CalendarOverview",
-      "capabilityId": "GetCalendarEvents",
-      "description": "会议/日程 Hero；面向 2x2 底部 PillAction 组合，标题区显示日期，内容区为左侧时间轴和会议标题时间。 组件形态：nextEventHero。",
-      "optionalData": [],
-      "entry": "templates/schedule-overview.cardtpl",
-      "primaryData": [
-        "/events/0/title",
-        "/events/0/dtStart"
-      ],
-      "secondaryData": [
-        "/events/0/dtEnd",
-        "/events/0/startDate"
+        "/events/0/dtEnd"
       ]
     },
     {
       "templateId": "ScheduleOverviewNextEventLocationFull@1",
       "businessId": "CalendarOverview",
       "capabilityId": "GetCalendarEvents",
-      "description": "会议/日程地点 Full；标题区显示日期，内容区为左侧时间轴和会议标题、时间、地点，不包含动作按钮。 组件形态：nextEventLocation。",
+      "description": "首个日程摘要，展示标题和时间，可补充结束时间与地点。 组件形态：nextEventLocation。",
       "optionalData": [],
       "entry": "templates/schedule-overview.cardtpl",
       "primaryData": [
@@ -92,15 +75,14 @@
       ],
       "secondaryData": [
         "/events/0/eventLocation",
-        "/events/0/dtEnd",
-        "/events/0/startDate"
+        "/events/0/dtEnd"
       ]
     },
     {
-      "templateId": "ScheduleOverviewNextEventLocationHero@1",
+      "templateId": "ScheduleOverviewMeetingCardFull@1",
       "businessId": "CalendarOverview",
       "capabilityId": "GetCalendarEvents",
-      "description": "会议/日程地点 Hero；面向 2x2 底部 PillAction 组合，标题区显示日期，内容区为左侧时间轴和会议标题、时间、地点。 组件形态：nextEventLocationHero。",
+      "description": "会议日程 Full；标题区展示日程日期，内容区展示会议标题、时间和地点，不内置行动按钮。 组件形态：meetingCard。",
       "optionalData": [],
       "entry": "templates/schedule-overview.cardtpl",
       "primaryData": [
@@ -108,9 +90,26 @@
         "/events/0/dtStart"
       ],
       "secondaryData": [
+        "/events/0/startDate",
         "/events/0/eventLocation",
-        "/events/0/dtEnd",
-        "/events/0/startDate"
+        "/events/0/dtEnd"
+      ]
+    },
+    {
+      "templateId": "ScheduleOverviewMeetingCardHero@1",
+      "businessId": "CalendarOverview",
+      "capabilityId": "GetCalendarEvents",
+      "description": "会议日程 Hero；标题区展示日程日期，内容区展示会议标题、时间和地点，用于第二层组合一个 PillAction。 组件形态：meetingCardHero。",
+      "optionalData": [],
+      "entry": "templates/schedule-overview.cardtpl",
+      "primaryData": [
+        "/events/0/title",
+        "/events/0/dtStart"
+      ],
+      "secondaryData": [
+        "/events/0/startDate",
+        "/events/0/eventLocation",
+        "/events/0/dtEnd"
       ]
     },
     {

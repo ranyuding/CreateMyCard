@@ -23,7 +23,7 @@
       "templateId": "BatteryOverviewNormalFull@1",
       "businessId": "BatteryOverview",
       "capabilityId": "GetPhoneBatteryInfo",
-      "description": "手机电量 Full；固定 2x2 电量骨架，只包含环形电量与剩余电量文案，不包含动作按钮。 组件形态：normal。",
+      "description": "手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：normal。",
       "optionalData": [],
       "entry": "templates/battery-overview.cardtpl",
       "primaryData": [
@@ -39,20 +39,24 @@
       "templateId": "BatteryOverviewNormalHero@1",
       "businessId": "BatteryOverview",
       "capabilityId": "GetPhoneBatteryInfo",
-      "description": "手机电量 Hero；面向 2x2 底部 PillAction 组合，只包含环形电量与剩余电量文案。 组件形态：normalHero。",
-      "optionalData": [],
+      "description": "手机电量摘要，面向 2x2 底部 PillAction 预留空间。 组件形态：normalHero。",
+      "optionalData": [
+        "/batterySOCText",
+        "/chargingStatusDesc"
+      ],
       "entry": "templates/battery-overview.cardtpl",
       "primaryData": [
-        "/batterySOC",
-        "/batterySOCText"
+        "/batterySOC"
       ],
-      "secondaryData": []
+      "secondaryData": [
+        "/batteryCapacityLevelDesc"
+      ]
     },
     {
       "templateId": "BatteryOverviewChargingFull@1",
       "businessId": "BatteryOverview",
       "capabilityId": "GetPhoneBatteryInfo",
-      "description": "手机电量 Full；固定 2x2 电量骨架，只包含环形电量与剩余电量文案，不包含动作按钮。 组件形态：charging。",
+      "description": "手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：charging。",
       "optionalData": [],
       "entry": "templates/battery-overview.cardtpl",
       "primaryData": [
@@ -63,25 +67,12 @@
         "/chargingStatusDesc",
         "/batteryCapacityLevelDesc"
       ]
-    },
-    {
-      "templateId": "BatteryOverviewChargingHero@1",
-      "businessId": "BatteryOverview",
-      "capabilityId": "GetPhoneBatteryInfo",
-      "description": "手机电量 Hero；面向 2x2 底部 PillAction 组合，只包含环形电量与剩余电量文案。 组件形态：chargingHero。",
-      "optionalData": [],
-      "entry": "templates/battery-overview.cardtpl",
-      "primaryData": [
-        "/batterySOC",
-        "/batterySOCText"
-      ],
-      "secondaryData": []
     },
     {
       "templateId": "BatteryOverviewLowFull@1",
       "businessId": "BatteryOverview",
       "capabilityId": "GetPhoneBatteryInfo",
-      "description": "手机电量 Full；固定 2x2 电量骨架，只包含环形电量与剩余电量文案，不包含动作按钮。 组件形态：low。",
+      "description": "手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：low。",
       "optionalData": [],
       "entry": "templates/battery-overview.cardtpl",
       "primaryData": [
@@ -94,17 +85,33 @@
       ]
     },
     {
-      "templateId": "BatteryOverviewLowHero@1",
+      "templateId": "BatteryOverviewLowPowerSavingFull@1",
       "businessId": "BatteryOverview",
       "capabilityId": "GetPhoneBatteryInfo",
-      "description": "手机电量 Hero；面向 2x2 底部 PillAction 组合，只包含环形电量与剩余电量文案。 组件形态：lowHero。",
+      "description": "省电模式提示 Full；居中展示电量环、电量等级和百分比文本，不内置行动按钮。 组件形态：powerSaving。",
       "optionalData": [],
       "entry": "templates/battery-overview.cardtpl",
       "primaryData": [
         "/batterySOC",
         "/batterySOCText"
       ],
-      "secondaryData": []
+      "secondaryData": [
+        "/batteryCapacityLevelDesc"
+      ]
+    },
+    {
+      "templateId": "BatteryOverviewLowPowerSavingHero@1",
+      "businessId": "BatteryOverview",
+      "capabilityId": "GetPhoneBatteryInfo",
+      "description": "省电模式提示 Hero；居中展示电量环和电量等级，用于第二层组合一个 PillAction。 组件形态：powerSavingHero。",
+      "optionalData": [],
+      "entry": "templates/battery-overview.cardtpl",
+      "primaryData": [
+        "/batterySOC"
+      ],
+      "secondaryData": [
+        "/batteryCapacityLevelDesc"
+      ]
     },
     {
       "templateId": "BatteryOverviewNormalWideFull@1",
@@ -293,3 +300,4 @@
     "a2uiWireVersion": "v0.9"
   }
 }
+
