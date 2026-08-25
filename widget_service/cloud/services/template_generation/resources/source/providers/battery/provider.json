@@ -23,7 +23,7 @@
       "templateId": "BatteryOverviewNormalFull@1",
       "businessId": "BatteryOverview",
       "capabilityId": "GetPhoneBatteryInfo",
-      "description": "手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：normal。",
+      "description": "电量省电 Full；固定 2x2 电量骨架，环形电量、剩余电量文案和开启省电模式胶囊按钮位置固定，仅背景色按状态变化。 组件形态：normal。",
       "optionalData": [],
       "entry": "templates/battery-overview.cardtpl",
       "primaryData": [
@@ -56,7 +56,7 @@
       "templateId": "BatteryOverviewChargingFull@1",
       "businessId": "BatteryOverview",
       "capabilityId": "GetPhoneBatteryInfo",
-      "description": "手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：charging。",
+      "description": "电量省电 Full；固定 2x2 电量骨架，环形电量、剩余电量文案和开启省电模式胶囊按钮位置固定，仅背景色按状态变化。 组件形态：charging。",
       "optionalData": [],
       "entry": "templates/battery-overview.cardtpl",
       "primaryData": [
@@ -72,7 +72,7 @@
       "templateId": "BatteryOverviewLowFull@1",
       "businessId": "BatteryOverview",
       "capabilityId": "GetPhoneBatteryInfo",
-      "description": "手机电量摘要，展示电量数值、文本、充电状态和电量等级。 组件形态：low。",
+      "description": "电量省电 Full；固定 2x2 电量骨架，环形电量、剩余电量文案和开启省电模式胶囊按钮位置固定，仅背景色按状态变化。 组件形态：low。",
       "optionalData": [],
       "entry": "templates/battery-overview.cardtpl",
       "primaryData": [

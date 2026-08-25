@@ -1,80 +1,58 @@
 #Template ScheduleOverviewNextEventFull@1(props: { sourceIcon?: asset, timeIcon?: asset })
 data = {
     title: $path("/events/0/title"),
+    startDate: $path("/events/0/startDate"),
     start: $path("/events/0/dtStart"),
     end: $path("/events/0/dtEnd")
 }
 
 Column(
   "compact",
-  {"_advancedComponent": "ScheduleOverview", "width": "100%", "height": "100%", "itemMargin": 4, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
-  Row(
-      "between",
-      {"width": "100%", "height": 20, "itemMargin": 4, "justifyContent": "spaceBetween", "alignItems": "top", "clip": true},
-      Text(
-            "下一个日程",
-            "subtitle",
-            {"width": "100%", "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#99000000", "maxLines": 1, "textOverflow": "ellipsis", "layoutWeight": 1, "constraintSize": {"minWidth": 0, "minHeight": 0}}
-          ),
-      IfPresent(
-            props.sourceIcon,
-            Image(
-                    props.sourceIcon,
-                    "icon",
-                    {"width": 12, "height": 12, "objectFit": "contain", "fillColor": "#FFFF3B30"}
-                  )
-          )
+  {"_advancedComponent": "ScheduleOverview", "width": "100%", "height": "100%", "itemMargin": 14, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+  Text(
+      data.startDate,
+      "compact-title",
+      {"width": "100%", "height": 16, "fontSize": 12, "minFontSize": 12, "fontWeight": 500, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
     ),
   Row(
       "between",
-      {"width": "100%", "height": "100%", "layoutWeight": 1, "itemMargin": 8, "justifyContent": "start", "alignItems": "center", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+      {"width": "100%", "height": 50, "itemMargin": 8, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
       Column(
             "compact",
-            {"width": 8, "height": "100%", "itemMargin": 2, "justifyContent": "start", "alignItems": "center", "flexShrink": 0, "clip": true},
+            {"width": 8, "height": 50, "itemMargin": 4, "justifyContent": "start", "alignItems": "center", "flexShrink": 0, "clip": true},
             Stack(
                     "overlay",
-                    {"width": 8, "height": 8, "borderRadius": 4, "borderWidth": 2, "borderColor": "#FFFF3B30", "backgroundColor": "#00FFFFFF", "alignContent": "center", "flexShrink": 0},
+                    {"width": 8, "height": 8, "borderRadius": 4, "borderWidth": 2, "borderColor": "#FFE84026", "backgroundColor": "#00FFFFFF", "alignContent": "center", "flexShrink": 0},
                     Divider(
                               {"width": 0, "height": 0, "strokeWidth": 0, "color": "#00FFFFFF"}
                             )
                   ),
             Divider(
-                    {"width": 1, "height": 28, "strokeWidth": 1, "vertical": true, "color": "#1F000000"}
+                    {"width": 1, "height": 32, "strokeWidth": 1, "vertical": true, "color": "#19000000"}
                   )
           ),
       Column(
             "compact",
-            {"width": "100%", "height": "100%", "layoutWeight": 1, "itemMargin": 4, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+            {"width": "100%", "height": 50, "layoutWeight": 1, "itemMargin": 2, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
             Text(
                     data.title,
                     "title",
-                    {"width": "100%", "height": 28, "fontSize": 20, "minFontSize": 20, "fontWeight": 700, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                    {"width": "100%", "height": 16, "fontSize": 12, "minFontSize": 12, "fontWeight": 700, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                   ),
-            IfAbsent(
-                    props.timeIcon,
-                    Text(
-                              `${data.start} - ${data.end}`,
-                              "subtitle",
-                              {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#99000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
-                            )
-                  ),
-            IfPresent(
-                    props.timeIcon,
-                    Row(
-                              "between",
-                              {"width": "100%", "itemMargin": 4, "justifyContent": "start", "alignItems": "top", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
-                              Image(
-                                          props.timeIcon,
-                                          "icon",
-                                          {"width": 12, "height": 12, "objectFit": "contain"}
-                                        ),
-                              Text(
-                                          `${data.start} - ${data.end}`,
-                                          "subtitle",
-                                          {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#99000000", "maxLines": 1, "textOverflow": "ellipsis", "layoutWeight": 1, "constraintSize": {"minWidth": 0, "minHeight": 0}}
-                                        )
-                            )
+            Text(
+                    `${data.start} - ${data.end}`,
+                    "subtitle",
+                    {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#66000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                   )
+          )
+    ),
+  Stack(
+      "overlay",
+      {"width": "100%", "height": 36, "borderRadius": 18, "backgroundColor": "#1AE84026", "alignContent": "center", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+      Text(
+            "加入会议",
+            "body",
+            {"width": "100%", "fontSize": 14, "minFontSize": 14, "fontWeight": 500, "fontColor": "#FFE84026", "textAlign": "center", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
           )
     )
 )
@@ -84,105 +62,63 @@ Column(
 data = {
     title: $path("/events/0/title"),
     location: $path("/events/0/eventLocation"),
+    startDate: $path("/events/0/startDate"),
     start: $path("/events/0/dtStart"),
     end: $path("/events/0/dtEnd")
 }
 
 Column(
   "compact",
-  {"_advancedComponent": "ScheduleOverview", "width": "100%", "height": "100%", "itemMargin": 4, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
-  Row(
-      "between",
-      {"width": "100%", "height": 20, "itemMargin": 4, "justifyContent": "spaceBetween", "alignItems": "top", "clip": true},
-      Text(
-            "下一个日程",
-            "subtitle",
-            {"width": "100%", "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#99000000", "maxLines": 1, "textOverflow": "ellipsis", "layoutWeight": 1, "constraintSize": {"minWidth": 0, "minHeight": 0}}
-          ),
-      IfPresent(
-            props.sourceIcon,
-            Image(
-                    props.sourceIcon,
-                    "icon",
-                    {"width": 12, "height": 12, "objectFit": "contain", "fillColor": "#FFFF3B30"}
-                  )
-          )
+  {"_advancedComponent": "ScheduleOverview", "width": "100%", "height": "100%", "itemMargin": 14, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+  Text(
+      data.startDate,
+      "compact-title",
+      {"width": "100%", "height": 16, "fontSize": 12, "minFontSize": 12, "fontWeight": 500, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
     ),
   Row(
       "between",
-      {"width": "100%", "height": "100%", "layoutWeight": 1, "itemMargin": 8, "justifyContent": "start", "alignItems": "center", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+      {"width": "100%", "height": 50, "itemMargin": 8, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
       Column(
             "compact",
-            {"width": 8, "height": "100%", "itemMargin": 2, "justifyContent": "start", "alignItems": "center", "flexShrink": 0, "clip": true},
+            {"width": 8, "height": 50, "itemMargin": 4, "justifyContent": "start", "alignItems": "center", "flexShrink": 0, "clip": true},
             Stack(
                     "overlay",
-                    {"width": 8, "height": 8, "borderRadius": 4, "borderWidth": 2, "borderColor": "#FFFF3B30", "backgroundColor": "#00FFFFFF", "alignContent": "center", "flexShrink": 0},
+                    {"width": 8, "height": 8, "borderRadius": 4, "borderWidth": 2, "borderColor": "#FFE84026", "backgroundColor": "#00FFFFFF", "alignContent": "center", "flexShrink": 0},
                     Divider(
                               {"width": 0, "height": 0, "strokeWidth": 0, "color": "#00FFFFFF"}
                             )
                   ),
             Divider(
-                    {"width": 1, "height": 42, "strokeWidth": 1, "vertical": true, "color": "#1F000000"}
+                    {"width": 1, "height": 32, "strokeWidth": 1, "vertical": true, "color": "#19000000"}
                   )
           ),
       Column(
             "compact",
-            {"width": "100%", "height": "100%", "layoutWeight": 1, "itemMargin": 4, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+            {"width": "100%", "height": 50, "layoutWeight": 1, "itemMargin": 2, "justifyContent": "start", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
             Text(
                     data.title,
                     "title",
-                    {"width": "100%", "height": 28, "fontSize": 20, "minFontSize": 20, "fontWeight": 700, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+                    {"width": "100%", "height": 16, "fontSize": 12, "minFontSize": 12, "fontWeight": 700, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                   ),
-            IfAbsent(
-                    props.timeIcon,
-                    Text(
-                              `${data.start} - ${data.end}`,
-                              "subtitle",
-                              {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#99000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
-                            )
+            Text(
+                    `${data.start} - ${data.end}`,
+                    "subtitle",
+                    {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#66000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                   ),
-            IfPresent(
-                    props.timeIcon,
-                    Row(
-                              "between",
-                              {"width": "100%", "itemMargin": 4, "justifyContent": "start", "alignItems": "top", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
-                              Image(
-                                          props.timeIcon,
-                                          "icon",
-                                          {"width": 12, "height": 12, "objectFit": "contain"}
-                                        ),
-                              Text(
-                                          `${data.start} - ${data.end}`,
-                                          "subtitle",
-                                          {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 12, "fontWeight": 400, "fontColor": "#99000000", "maxLines": 1, "textOverflow": "ellipsis", "layoutWeight": 1, "constraintSize": {"minWidth": 0, "minHeight": 0}}
-                                        )
-                            )
+            Text(
+                    data.location,
+                    "subtitle",
+                    {"width": "100%", "height": 14, "fontSize": 12, "minFontSize": 10, "fontWeight": 400, "fontColor": "#66000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
                   ),
-            IfAbsent(
-                    props.locationIcon,
-                    Text(
-                              data.location,
-                              "subtitle",
-                              {"width": "100%", "height": 14, "fontSize": 10, "minFontSize": 10, "fontWeight": 400, "fontColor": "#66000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
-                            )
-                  ),
-            IfPresent(
-                    props.locationIcon,
-                    Row(
-                              "between",
-                              {"width": "100%", "itemMargin": 4, "justifyContent": "start", "alignItems": "top", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
-                              Image(
-                                          props.locationIcon,
-                                          "icon",
-                                          {"width": 12, "height": 12, "objectFit": "contain"}
-                                        ),
-                              Text(
-                                          data.location,
-                                          "subtitle",
-                                          {"width": "100%", "height": 14, "fontSize": 10, "minFontSize": 10, "fontWeight": 400, "fontColor": "#66000000", "maxLines": 1, "textOverflow": "ellipsis", "layoutWeight": 1, "constraintSize": {"minWidth": 0, "minHeight": 0}}
-                                        )
-                            )
-                  )
+          )
+    ),
+  Stack(
+      "overlay",
+      {"width": "100%", "height": 36, "borderRadius": 18, "backgroundColor": "#1AE84026", "alignContent": "center", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+      Text(
+            "加入会议",
+            "body",
+            {"width": "100%", "fontSize": 14, "minFontSize": 14, "fontWeight": 500, "fontColor": "#FFE84026", "textAlign": "center", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
           )
     )
 )

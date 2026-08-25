@@ -47,7 +47,7 @@
       "templateId": "ActivityOverviewDailySummaryFull@1",
       "businessId": "ActivityOverview",
       "capabilityId": "GetHealthAndSportSummary",
-      "description": "每日活动摘要，展示步数，可补充热量和距离。 组件形态：dailySummary。",
+      "description": "运动步数 Full；黄橙渐变卡片，标题区显示今日步数和运动图标，中部显示大号步数和进度条，底部显示距离与热量。 组件形态：dailySummary。",
       "optionalData": [],
       "entry": "templates/activity-overview.cardtpl",
       "primaryData": [

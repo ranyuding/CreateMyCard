@@ -209,7 +209,8 @@ def _build_case(
         bindings,
     )
     content = _strip_advanced_component_markers(content)
-    root = _preview_root(content, content_height)
+    preview_content_height = _preview_content_height(content, content_height)
+    root = _preview_root(content, preview_content_height)
     effective = _serialize_effective_document(root, task_spec, True)
     a2ui = convert_terse_dsl_nested2_to_a2ui(
         effective,
@@ -227,7 +228,7 @@ def _build_case(
         description=definition.description,
         layout_kind=layout_kind,
         size=size,
-        content_height_vp=content_height,
+        content_height_vp=preview_content_height,
         primary_data=definition.primary_data,
         secondary_data=definition.secondary_data,
         optional_data=definition.optional_data,
@@ -359,6 +360,7 @@ def _binding_placeholder(definition: TemplateDefinition, binding: TemplateBindin
 
 
 def _preview_root(content: Nested2Node, content_height: int) -> Nested2Node:
+    self_surfaced_full = content_height == 160 and _has_card_surface(content)
     slot_options = {
         "width": "matchParent",
         "height": content_height,
@@ -369,15 +371,28 @@ def _preview_root(content: Nested2Node, content_height: int) -> Nested2Node:
     }
     root_options = {
         "_id": "root",
-        "padding": 12,
+        "padding": 0 if self_surfaced_full else 12,
         "borderRadius": 20,
-        "backgroundColor": "#FFFFFFFF",
+        "backgroundColor": "#00000000" if self_surfaced_full else "#FFFFFFFF",
         "justifyContent": "start",
         "alignItems": "start",
         "clip": True,
     }
     slot = Nested2Node("Column", ("section", slot_options), (content,))
     return Nested2Node("Column", ("card", root_options), (slot,))
+
+
+def _preview_content_height(content: Nested2Node, content_height: int) -> int:
+    if content_height == 136 and _has_card_surface(content):
+        return 160
+    return content_height
+
+
+def _has_card_surface(content: Nested2Node) -> bool:
+    if len(content.values) < 2 or not isinstance(content.values[1], dict):
+        return False
+    options = content.values[1]
+    return any(key in options for key in ("backgroundColor", "linearGradient", "backgroundImage"))
 
 
 def _write_json(path: Path, payload: Any) -> None:

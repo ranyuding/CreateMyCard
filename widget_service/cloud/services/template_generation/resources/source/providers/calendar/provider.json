@@ -51,7 +51,7 @@
       "templateId": "ScheduleOverviewNextEventFull@1",
       "businessId": "CalendarOverview",
       "capabilityId": "GetCalendarEvents",
-      "description": "首个日程摘要，展示标题和时间，可补充结束时间与地点。 组件形态：nextEvent。",
+      "description": "会议/日程 Full；标题区显示日期，内容区为左侧时间轴和会议标题时间，底部固定胶囊按钮。 组件形态：nextEvent。",
       "optionalData": [],
       "entry": "templates/schedule-overview.cardtpl",
       "primaryData": [
@@ -59,14 +59,15 @@
         "/events/0/dtStart"
       ],
       "secondaryData": [
-        "/events/0/dtEnd"
+        "/events/0/dtEnd",
+        "/events/0/startDate"
       ]
     },
     {
       "templateId": "ScheduleOverviewNextEventLocationFull@1",
       "businessId": "CalendarOverview",
       "capabilityId": "GetCalendarEvents",
-      "description": "首个日程摘要，展示标题和时间，可补充结束时间与地点。 组件形态：nextEventLocation。",
+      "description": "会议/日程地点 Full；标题区显示日期，内容区为左侧时间轴和会议标题、时间、地点，底部固定胶囊按钮。 组件形态：nextEventLocation。",
       "optionalData": [],
       "entry": "templates/schedule-overview.cardtpl",
       "primaryData": [
@@ -75,7 +76,8 @@
       ],
       "secondaryData": [
         "/events/0/eventLocation",
-        "/events/0/dtEnd"
+        "/events/0/dtEnd",
+        "/events/0/startDate"
       ]
     },
     {

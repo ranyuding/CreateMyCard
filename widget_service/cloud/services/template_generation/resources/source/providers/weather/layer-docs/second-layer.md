@@ -11,10 +11,10 @@
 - `WeatherOverviewHero@1`：温度 Hero 摘要；约 2x1.7，只用于一个 Hero 加一个 PillAction。
   主数据：`/current/temperatureText`；次要数据：`/location/districtName`、
   `/current/condition`、`/current/coldLevel`；可选数据：无。
-- `WeatherOverviewFull@1`：完整温度摘要；完整 2x2，可单独使用或加一个 IconAction。
+- `WeatherOverviewFull@1`：蓝色天气 Full；标题区显示城市，中部显示大号温度，底部显示天气、空气质量和温度区间。完整 2x2，可单独使用或加一个 IconAction。
   主数据：`/current/temperatureText`；次要数据：`/location/districtName`、
-  `/current/condition`、`/current/airQuality`、`/current/coldLevel`；可选数据：无。
-- `WeatherOverviewIconFull@1`：带天气图标的完整温度摘要；布局和数据分级与
+  `/current/condition`、`/current/airQuality`、`/daily/0/temperatureRangeText`；可选数据：无。
+- `WeatherOverviewIconFull@1`：标题区固定为城市文字加天气图标的蓝色天气 Full；布局和数据分级与
   `WeatherOverviewFull@1` 相同。
 - `WeatherOverviewConditionFull@1`：天气现象摘要；完整 2x2，可单独使用或加一个 IconAction。
   主数据：`/current/condition`；次要数据：`/location/districtName`、

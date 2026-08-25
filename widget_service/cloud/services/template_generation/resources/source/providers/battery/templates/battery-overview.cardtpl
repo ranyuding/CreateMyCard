@@ -1,41 +1,39 @@
 #Template BatteryOverviewNormalFull@1(props: { batteryIcon?: asset })
 data = {
     percent: $path("/batterySOC"),
-    percentText: $path("/batterySOCText"),
-    charging: $path("/chargingStatusDesc"),
-    level: $path("/batteryCapacityLevelDesc")
+    percentText: $path("/batterySOCText")
 }
 
 Column(
   "compact",
-  {"_advancedComponent": "BatteryOverview", "width": "matchParent", "height": "matchParent", "itemMargin": 4, "justifyContent": "spaceBetween", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
-  Text(
-      "设备电量",
-      "subtitle",
-      {"width": "matchParent", "fontSize": 16, "fontWeight": 700, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+  {"_advancedComponent": "BatteryOverview", "width": "matchParent", "height": "matchParent", "padding": {"left": 0, "top": 20, "right": 0, "bottom": 13}, "borderRadius": 20, "backgroundColor": "#FFF2FAF1", "itemMargin": 0, "justifyContent": "start", "alignItems": "center", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+  Stack(
+      "overlay",
+      {"width": 52, "height": 52, "alignContent": "center", "flexShrink": 0},
+      Progress(
+            {"value": data.percent, "total": 100, "type": "ring", "color": "#FF64BB5C", "backgroundColor": "#3364BB5C", "width": 52, "height": 52, "strokeWidth": 6}
+          ),
+      IfPresent(
+            props.batteryIcon,
+            Image(
+                    props.batteryIcon,
+                    "icon",
+                    {"width": 20, "height": 20, "objectFit": "contain", "fillColor": "#FF3C7037"}
+                  )
+          )
     ),
   Text(
-      `电量 ${data.percentText}，${data.level}，${data.charging}`,
+      `手机电量剩余${data.percentText}`,
       "body",
-      {"width": "matchParent", "fontSize": 12, "fontWeight": 400, "fontColor": "#99000000", "maxLines": 2, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+      {"width": 136, "height": 28, "margin": {"left": 0, "top": 3, "right": 0, "bottom": 0}, "fontSize": 14, "fontWeight": 400, "fontColor": "#FF50964A", "textAlign": "center", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
     ),
   Stack(
       "overlay",
-      {"width": "matchParent", "height": "matchParent", "layoutWeight": 1, "alignContent": "bottomStart", "constraintSize": {"minWidth": 0, "minHeight": 0}},
-      Stack(
-            "overlay",
-            {"width": 52, "height": 52, "alignContent": "center", "flexShrink": 0},
-            Progress(
-                    {"value": data.percent, "total": 100, "type": "ring", "color": "#FFF9A01E", "backgroundColor": "#1A000000", "width": 52, "height": 52, "strokeWidth": 6}
-                  ),
-            IfPresent(
-                    props.batteryIcon,
-                    Image(
-                              props.batteryIcon,
-                              "icon",
-                              {"width": 24, "height": 24, "objectFit": "contain", "fillColor": "#99000000"}
-                            )
-                  )
+      {"width": 136, "height": 36, "margin": {"left": 0, "top": 8, "right": 0, "bottom": 0}, "borderRadius": 40, "backgroundColor": "#3364BB5C", "alignContent": "center", "clip": true},
+      Text(
+            "开启省电模式",
+            "body",
+            {"width": 92, "height": 20, "fontSize": 14, "minFontSize": 10, "fontWeight": 500, "fontColor": "#FF3C7037", "textAlign": "center", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
           )
     )
 )
@@ -124,41 +122,39 @@ Column(
 #Template BatteryOverviewChargingFull@1(props: { batteryIcon?: asset })
 data = {
     percent: $path("/batterySOC"),
-    percentText: $path("/batterySOCText"),
-    charging: $path("/chargingStatusDesc"),
-    level: $path("/batteryCapacityLevelDesc")
+    percentText: $path("/batterySOCText")
 }
 
 Column(
   "compact",
-  {"_advancedComponent": "BatteryOverview", "width": "matchParent", "height": "matchParent", "itemMargin": 4, "justifyContent": "spaceBetween", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
-  Text(
-      "设备电量",
-      "subtitle",
-      {"width": "matchParent", "fontSize": 16, "fontWeight": 700, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+  {"_advancedComponent": "BatteryOverview", "width": "matchParent", "height": "matchParent", "padding": {"left": 0, "top": 20, "right": 0, "bottom": 13}, "borderRadius": 20, "backgroundColor": "#FFFFF7E8", "itemMargin": 0, "justifyContent": "start", "alignItems": "center", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+  Stack(
+      "overlay",
+      {"width": 52, "height": 52, "alignContent": "center", "flexShrink": 0},
+      Progress(
+            {"value": data.percent, "total": 100, "type": "ring", "color": "#FF64BB5C", "backgroundColor": "#3364BB5C", "width": 52, "height": 52, "strokeWidth": 6}
+          ),
+      IfPresent(
+            props.batteryIcon,
+            Image(
+                    props.batteryIcon,
+                    "icon",
+                    {"width": 20, "height": 20, "objectFit": "contain", "fillColor": "#FF3C7037"}
+                  )
+          )
     ),
   Text(
-      `电量 ${data.percentText}，${data.level}，${data.charging}`,
+      `手机电量剩余${data.percentText}`,
       "body",
-      {"width": "matchParent", "fontSize": 12, "fontWeight": 400, "fontColor": "#99000000", "maxLines": 2, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+      {"width": 136, "height": 28, "margin": {"left": 0, "top": 3, "right": 0, "bottom": 0}, "fontSize": 14, "fontWeight": 400, "fontColor": "#FF50964A", "textAlign": "center", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
     ),
   Stack(
       "overlay",
-      {"width": "matchParent", "height": "matchParent", "layoutWeight": 1, "alignContent": "bottomStart", "constraintSize": {"minWidth": 0, "minHeight": 0}},
-      Stack(
-            "overlay",
-            {"width": 52, "height": 52, "alignContent": "center", "flexShrink": 0},
-            Progress(
-                    {"value": data.percent, "total": 100, "type": "ring", "color": "#FFF9A01E", "backgroundColor": "#1A000000", "width": 52, "height": 52, "strokeWidth": 6}
-                  ),
-            IfPresent(
-                    props.batteryIcon,
-                    Image(
-                              props.batteryIcon,
-                              "icon",
-                              {"width": 24, "height": 24, "objectFit": "contain", "fillColor": "#99000000"}
-                            )
-                  )
+      {"width": 136, "height": 36, "margin": {"left": 0, "top": 8, "right": 0, "bottom": 0}, "borderRadius": 40, "backgroundColor": "#3364BB5C", "alignContent": "center", "clip": true},
+      Text(
+            "开启省电模式",
+            "body",
+            {"width": 92, "height": 20, "fontSize": 14, "minFontSize": 10, "fontWeight": 500, "fontColor": "#FF3C7037", "textAlign": "center", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
           )
     )
 )
@@ -167,41 +163,39 @@ Column(
 #Template BatteryOverviewLowFull@1(props: { batteryIcon?: asset })
 data = {
     percent: $path("/batterySOC"),
-    percentText: $path("/batterySOCText"),
-    charging: $path("/chargingStatusDesc"),
-    level: $path("/batteryCapacityLevelDesc")
+    percentText: $path("/batterySOCText")
 }
 
 Column(
   "compact",
-  {"_advancedComponent": "BatteryOverview", "width": "matchParent", "height": "matchParent", "itemMargin": 4, "justifyContent": "spaceBetween", "alignItems": "start", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
-  Text(
-      "设备电量",
-      "subtitle",
-      {"width": "matchParent", "fontSize": 16, "fontWeight": 700, "fontColor": "#E6000000", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+  {"_advancedComponent": "BatteryOverview", "width": "matchParent", "height": "matchParent", "padding": {"left": 0, "top": 20, "right": 0, "bottom": 13}, "borderRadius": 20, "backgroundColor": "#FFEFF8EF", "itemMargin": 0, "justifyContent": "start", "alignItems": "center", "clip": true, "constraintSize": {"minWidth": 0, "minHeight": 0}},
+  Stack(
+      "overlay",
+      {"width": 52, "height": 52, "alignContent": "center", "flexShrink": 0},
+      Progress(
+            {"value": data.percent, "total": 100, "type": "ring", "color": "#FF64BB5C", "backgroundColor": "#3364BB5C", "width": 52, "height": 52, "strokeWidth": 6}
+          ),
+      IfPresent(
+            props.batteryIcon,
+            Image(
+                    props.batteryIcon,
+                    "icon",
+                    {"width": 20, "height": 20, "objectFit": "contain", "fillColor": "#FF3C7037"}
+                  )
+          )
     ),
   Text(
-      `电量 ${data.percentText}，${data.level}，${data.charging}`,
+      `手机电量剩余${data.percentText}`,
       "body",
-      {"width": "matchParent", "fontSize": 12, "fontWeight": 400, "fontColor": "#99000000", "maxLines": 2, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
+      {"width": 136, "height": 28, "margin": {"left": 0, "top": 3, "right": 0, "bottom": 0}, "fontSize": 14, "fontWeight": 400, "fontColor": "#FF50964A", "textAlign": "center", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
     ),
   Stack(
       "overlay",
-      {"width": "matchParent", "height": "matchParent", "layoutWeight": 1, "alignContent": "bottomStart", "constraintSize": {"minWidth": 0, "minHeight": 0}},
-      Stack(
-            "overlay",
-            {"width": 52, "height": 52, "alignContent": "center", "flexShrink": 0},
-            Progress(
-                    {"value": data.percent, "total": 100, "type": "ring", "color": "#FFF9A01E", "backgroundColor": "#1A000000", "width": 52, "height": 52, "strokeWidth": 6}
-                  ),
-            IfPresent(
-                    props.batteryIcon,
-                    Image(
-                              props.batteryIcon,
-                              "icon",
-                              {"width": 24, "height": 24, "objectFit": "contain", "fillColor": "#99000000"}
-                            )
-                  )
+      {"width": 136, "height": 36, "margin": {"left": 0, "top": 8, "right": 0, "bottom": 0}, "borderRadius": 40, "backgroundColor": "#3364BB5C", "alignContent": "center", "clip": true},
+      Text(
+            "开启省电模式",
+            "body",
+            {"width": 92, "height": 20, "fontSize": 14, "minFontSize": 10, "fontWeight": 500, "fontColor": "#FF3C7037", "textAlign": "center", "maxLines": 1, "textOverflow": "ellipsis", "constraintSize": {"minWidth": 0, "minHeight": 0}}
           )
     )
 )
