@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import colorsys
 import copy
 import re
 from dataclasses import dataclass
@@ -21,16 +20,13 @@ FUSION_BALL_DESIGN_TOKENS = (
 )
 
 _VERSION_PATTERN = re.compile(r"\d+(?:\.\d+)*")
-_BASE_COLOR_PATTERN = re.compile(r"^#[0-9A-Fa-f]{6}(?:[0-9A-Fa-f]{2})?$")
 _ARGB_COLOR_PATTERN = re.compile(r"^#[0-9A-Fa-f]{8}$")
 _FUSION_ROOT_TYPES = frozenset({"Row", "Column", "Stack"})
-_DESIGN_TOKEN_BASE_COLORS = {
-    "fusion-ball-schedule-cool": "#FF2BA2D9",
-    "fusion-ball-schedule-warm": "#FFFF5533",
-    "fusion-ball-sport-orange": "#FFFF8833",
-}
 _DESIGN_TOKEN_FIXED_PALETTES = {
+    "fusion-ball-schedule-cool": ("#FF121E59", "#FF2BA2D9", "#FF52CCCC"),
+    "fusion-ball-schedule-warm": ("#FF121E59", "#FF2BA2D9", "#FF52CCCC"),
     "fusion-ball-sleep-violet": ("#FF121E59", "#FF2BA2D9", "#FF52CCCC"),
+    "fusion-ball-sport-orange": ("#FFB33C24", "#FFFF8833", "#FFFAA89E"),
 }
 _FUSION_CAPSULE_BACKGROUND = "#33FFFFFF"
 _FUSION_CAPSULE_TEXT = "#E6FFFFFF"
@@ -108,22 +104,6 @@ def build_fusion_ball_palette(
     return FusionBallPalette(*(color.upper() for color in colors))
 
 
-def derive_fusion_ball_palette(base_color: str) -> FusionBallPalette:
-    """Use the base color as medium and derive large/small colors in HSB space."""
-    red, green, blue = _parse_base_color(base_color)
-    hue, saturation, brightness = colorsys.rgb_to_hsv(
-        red / 255,
-        green / 255,
-        blue / 255,
-    )
-    hue_degrees = hue * 360
-    return FusionBallPalette(
-        large=_hsb_color(hue_degrees + 25, saturation * 100, brightness * 100 - 40),
-        medium=_rgb_color(red, green, blue),
-        small=_hsb_color(hue_degrees - 25, saturation * 100 + 25, brightness * 100),
-    )
-
-
 def fusion_ball_palette_for_root(
     components: list[Any],
     *,
@@ -151,10 +131,7 @@ def fusion_ball_palette_for_root(
     fixed_palette = _DESIGN_TOKEN_FIXED_PALETTES.get(design_token)
     if fixed_palette is not None:
         return build_fusion_ball_palette(*fixed_palette)
-    base_color = _DESIGN_TOKEN_BASE_COLORS.get(design_token)
-    if base_color is None:
-        return None
-    return derive_fusion_ball_palette(base_color)
+    return None
 
 
 def expand_fusion_ball_components(
@@ -391,30 +368,3 @@ def _ball(component_id: str, diameter: int, color: str) -> dict[str, Any]:
             "clip": True,
         },
     }
-
-
-def _parse_base_color(value: str) -> tuple[int, int, int]:
-    if not isinstance(value, str) or _BASE_COLOR_PATTERN.fullmatch(value) is None:
-        raise FusionBallExpansionError("base_color must use #RRGGBB or #AARRGGBB.")
-    rgb = value[3:] if len(value) == 9 else value[1:]
-    return int(rgb[0:2], 16), int(rgb[2:4], 16), int(rgb[4:6], 16)
-
-
-def _hsb_color(hue: float, saturation: float, brightness: float) -> str:
-    normalized_hue = hue % 360 / 360
-    normalized_saturation = _clamp_percentage(saturation) / 100
-    normalized_brightness = _clamp_percentage(brightness) / 100
-    channels = colorsys.hsv_to_rgb(
-        normalized_hue,
-        normalized_saturation,
-        normalized_brightness,
-    )
-    return _rgb_color(*(round(channel * 255) for channel in channels))
-
-
-def _rgb_color(red: int, green: int, blue: int) -> str:
-    return f"#FF{red:02X}{green:02X}{blue:02X}"
-
-
-def _clamp_percentage(value: float) -> float:
-    return max(0.0, min(100.0, value))

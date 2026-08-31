@@ -266,9 +266,10 @@ Few-shot 只是演示，不授权额外字段、组件、路径、事件、素�
 
 除 root 融球 Style Design Token 外，不使用 design 语义令牌或色彩令牌；字号、字重、颜色、圆角、间距一律按批准档位显式写在 props（`fontSize`、`fontWeight`、`fontColor`、`fillColor`、`backgroundColor` 等，颜色只写 `#AARRGGBB`），取色逻辑见第十二节。`Progress` 的 `design:"linear-bar"` / `design:"ring"` 是组件形态别名，不是视觉档令牌。
 
-- 仅当 TaskSpec `size` 为 `2x2`，且卡片是单一业务/单一数据域时，root `Row`、`Column` 或 `Stack` 才可使用融球 Style Design Token。允许场景仅限：单个倒计时/纪念日用 `fusion-ball-sport-orange`，单个日程/提醒用 `fusion-ball-schedule-cool` 或 `fusion-ball-schedule-warm`，睡眠/专注单主题用 `fusion-ball-sleep-violet`。
+- 仅当 TaskSpec `size` 为 `2x2`，且卡片是单一业务/单一数据域时，root `Row`、`Column` 或 `Stack` 才可使用融球 Style Design Token。允许场景仅限：单个倒计时/纪念日用 `fusion-ball-sport-orange`，单个会议/日程/提醒用 `fusion-ball-schedule-cool` 或 `fusion-ball-schedule-warm`，睡眠/专注单主题用 `fusion-ball-sleep-violet`。
 - 天气、电量、运动列表、系统工具、设备状态、组合通勤、多个日程、多业务或多数据域卡片禁止使用融球，应回退纯色或弱渐变背景。
 - 使用融球 Design Token 时，root 的背景只写 `design`，不再写 `backgroundColor`、`linearGradient` 或 `backgroundImage`；尺寸、内边距、圆角、裁剪和布局属性仍按 root 规则显式填写。转换器会确定性展开融球背景，并把前景根的原 ID `root` 加上 `__genui_render_component__` 前缀，生成 `__genui_render_component__root` 防溢出标识；展开后的外层卡片根仍使用 `root`。
+- 融球三色由转换器按上方球、左侧球、右侧球固定映射：倒计时/纪念日为 `#B33C24`、`#FF8833`、`#FAA89E`；会议/日程/提醒为 `#121E59`、`#2BA2D9`、`#52CCCC`；睡眠/专注沿用 `#121E59`、`#2BA2D9`、`#52CCCC`。DSL 只写 root `design`，不要把这些颜色写成普通背景或手写圆球。
 
 ## 5.3 Text
 
@@ -761,7 +762,7 @@ TimelineUnit——会议/日程时间线：
 ## 背景形态三方案（优先级固定，命中后不再叠加另一种主形态）
 
 1. **方案二｜浅色材质（常规默认）**：日程、列表、设备、入口、工具、设置和高信息密度场景。背景色与内容信息色同 H：背景取 `S=10、B=100`（主题色与白约 1:9 混合的近白浅色，纯色或 `angle:180` 上深下浅的极弱渐变）；内容信息主色取 `S=80、B=60`（同色相中等明度深色）。
-2. **方案一｜深色端/融球（氛围场景）**：深色端用于天气、睡眠、运动、夜间、音乐、倒计时等氛围明确且低信息密度场景；夜间、睡眠、音乐、专注等真实暗色场景必须用其深色端。融球只用于 `2x2` 单一业务且内容相对简单的倒计时/纪念日、单个日程/提醒、睡眠/专注卡。倒计时/纪念日使用 `fusion-ball-sport-orange`，单个日程/提醒使用 `fusion-ball-schedule-cool` 或 `fusion-ball-schedule-warm`，睡眠/专注使用 `fusion-ball-sleep-violet`。天气、电量、设备、系统工具、运动列表、组合通勤、多日程、多业务或多数据域卡片禁止使用融球，优先使用纯色或弱渐变背景。使用融球时 root 只写 `design`，不再手写 `linearGradient`、`backgroundColor`、背景图或装饰圆球；不满足融球条件但需要氛围时，以中球颜色为基调，按同色族 2-3 个 stop 的 `angle:180` 渐变近似（上深下亮）或同族纯色深端；前景一律白色系。
+2. **方案一｜深色端/融球（氛围场景）**：深色端用于天气、睡眠、运动、夜间、音乐、倒计时等氛围明确且低信息密度场景；夜间、睡眠、音乐、专注等真实暗色场景必须用其深色端。融球只用于 `2x2` 单一业务且内容相对简单的倒计时/纪念日、单个会议/日程/提醒、睡眠/专注卡。倒计时/纪念日使用 `fusion-ball-sport-orange`，单个会议/日程/提醒使用 `fusion-ball-schedule-cool` 或 `fusion-ball-schedule-warm`，睡眠/专注使用 `fusion-ball-sleep-violet`。天气、电量、设备、系统工具、运动列表、组合通勤、多日程、多业务或多数据域卡片禁止使用融球，优先使用纯色或弱渐变背景。使用融球时 root 只写 `design`，不再手写 `linearGradient`、`backgroundColor`、背景图或装饰圆球；不满足融球条件但需要氛围时，以中球颜色为基调，按同色族 2-3 个 stop 的 `angle:180` 渐变近似（上深下亮）或同族纯色深端；前景一律白色系。
 3. **方案三｜纯白卡片**：背景 `#FFFFFFFF`，没有背景色相。全卡一个卡片主色，其色相从建议区间按服务对象语义选取（如会议/提醒红 `#FFE84026`、电量/健康绿 `#FF69D14F`）。
 4. **背景素材**：仅当 assetCandidates 提供语义准确的背景素材且具有平静留白时使用（多为 2x4 场景卡）；root 写原始 `backgroundImage` 和 `backgroundImageSizeWithStyle:"cover"`，前景保持简洁。背景素材沿用素材自身颜色，不套用三方案档位。
 5. **2x4 左右分区**：这不是独立配色形态，而是上述形态的组合限制。最多一侧使用高识别度场景面，另一侧保持中性或同色族弱材质，不能两侧同时争夺焦点。
@@ -844,7 +845,7 @@ TimelineUnit——会议/日程时间线：
 
 输出前必须逐项确认：
 
-1. **输出与协议**：是否只有一个 `genui` 代码块和可解析的极简协议 JSONL；是否没有 createSurface/updateComponents/updateDataModel/surfaceId/catalogId；root、组件字段和枚举是否正确；融球 Design Token 是否只在 `2x2` 单一业务的倒计时/纪念日、单个日程/提醒、睡眠/专注场景用于 root，且 root 未同时写普通背景。
+1. **输出与协议**：是否只有一个 `genui` 代码块和可解析的极简协议 JSONL；是否没有 createSurface/updateComponents/updateDataModel/surfaceId/catalogId；root、组件字段和枚举是否正确；融球 Design Token 是否只在 `2x2` 单一业务的倒计时/纪念日、单个会议/日程/提醒、睡眠/专注场景用于 root，且 root 未同时写普通背景。
 2. **引用与数据**：组件是否唯一、可达且引用闭合；Expression、PathBinding、模板路径与首帧 DataModel 是否存在并类型一致；是否没有孤立组件、空胶囊、局部 Expression 或静态样例冒充动态绑定。
 3. **候选与事件**：是否只保留最小充分候选；显式动作是否绑定，隐式入口是否不抢占空间，未被明确要求的副作用动作是否已删除；同一动作是否只有一个点击容器。
 4. **骨架与预算**：是否只使用一个固定骨架；root 宽高是否合法（matchParent 或画布数值）、padding 12、圆角 20、clip true；所有 Row/Column 两轴预算是否非负，动态文字 Row 是否保留余量，点击热区是否至少 24vp。
